@@ -1,0 +1,17 @@
+[project]
+name = "mcp-indicators"
+version = "0.1.0"
+requires-python = ">=3.11"
+description = "Indicators MCP server (tools/resources/prompts)"
+dependencies = [
+  "mcp",          # MCP Python SDK (includes FastMCP)
+  "pandas",
+  "pyarrow",
+  "pandas-ta",
+  "mcp-common",   # workspace lib
+]
+
+[project.scripts]
+indicators-mcp = "mcp_indicators.server:main"  # optional CLI entrypoint
+
+[tool.uv]

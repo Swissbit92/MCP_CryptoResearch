@@ -1,0 +1,12 @@
+[project]
+name = "mcp-farm"
+version = "0.0.0"
+requires-python = ">=3.11"
+description = "Monorepo for MCP servers (indicators/backtester/trading/...)."
+readme = "README.md"
+
+[tool.uv.workspace]
+members = ["packages/*", "libs/*"]
+
+[tool.uv]
+# (place shared dev settings here; workspace-level config applies to all members)

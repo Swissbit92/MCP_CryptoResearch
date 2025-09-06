@@ -1,0 +1,13 @@
+{
+  "servers": [
+    {
+      "label": "Indicators MCP",
+      "transport": {
+        "type": "stdio",
+        "command": "$pyJson",
+        "args": ["-m", "mcp_indicators.server"],
+        "env": { "PYTHONUNBUFFERED": "1" }
+      }
+    }
+  ]
+}
