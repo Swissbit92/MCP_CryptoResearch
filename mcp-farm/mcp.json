@@ -1,9 +1,9 @@
 {
   "mcpServers": {
-    "default-server": {
+    "indicators": {
       "type": "stdio",
-      "command": "C:\\Users\\rzehn\\Desktop\\Eeva_AI\\MCP_CryptoResearch\\Scripts\\python.exe",
-      "args": ["-m", "mcp_indicators.server"],
+      "command": "indicators-mcp",
+      "args": [],
       "env": {
         "PYTHONUNBUFFERED": "1",
         "INDICATORS_MCP_PREVIEW_ROWS": "8"
