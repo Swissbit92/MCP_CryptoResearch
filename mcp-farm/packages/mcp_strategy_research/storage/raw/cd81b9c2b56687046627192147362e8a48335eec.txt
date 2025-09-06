@@ -1,0 +1,5269 @@
+Predicting Bitcoin Market Trends with Enhanced Technical Indicator Integration and Classification Models
+I
+Introduction
+II
+Related Work
+III
+Data Collection, Preprocessing and Feature Engineering
+III-A
+Data Collection
+III-B
+Feature Engineering and Preprocessing
+III-B
+1
+Historical Data
+III-B
+2
+Technical Indicators
+III-B
+3
+Data Preprocessing
+III-B
+4
+Data Preprocessing
+IV
+Mathematical Model
+V
+Results & Interpretation
+V-A
+Simulation Setup
+V-B
+Results & Analysis
+VI
+Discussion & Comparison
+VII
+Conclusion
+A
+Time Series Data Splitting for Training and Testing
+A-A
+Training Set (First Part)
+A-B
+Testing Set (Remaining Part with Percentage Adjustment)
+B
+Hyperparameter Tuning for Logistic Regression
+Predicting Bitcoin Market Trends with Enhanced Technical Indicator Integration and Classification Models
+Abdelatif Hafid,
+Mohamed Rahouti,
+Linglong Kong,
+Maad Ebrahim,
+Mohamed Adel Serhani
+A. Hafid is with ESISA Analytica Laboratory, Higher School of Engineering in Applied Sciences, Fez, 24000, Morocco.
+E-mail: a.hafid@esisa.ac.ma
+M. Rahouti is with the Department of Computer & Information Science, Fordham University, New York, NY 10023, USA.
+L. Kong is with the Department of Mathematical and Statistical Sciences & Alberta Machine Intelligence Institute, University of Alberta, Edmonton, AB T6G 2G1, Canada.
+M. Ebrahim is with GAIA, Ericsson, Montreal, Canada.
+M. A. Serhani is with the Department of Information Systems, University of Sharjah.
+Abstract
+Thanks to the high potential for profit, trading has become increasingly attractive to investors as the cryptocurrency and stock markets rapidly expand. However, because financial markets are intricate and dynamic, accurately predicting prices remains a significant challenge. The volatile nature of the cryptocurrency market makes it even harder for traders and investors to make decisions. This study presents a machine learning model based on classification to forecast the direction of the cryptocurrency market, i.e., whether prices will increase or decrease. The model is trained using historical data and important technical indicators such as the Moving Average Convergence Divergence, the Relative Strength Index, and Bollinger Bands. We illustrate our approach with an empirical study of the closing price of Bitcoin. Several simulations, including a confusion matrix and Receiver Operating Characteristic curve, are used to assess the model’s performance, and the results show a buy/sell signal accuracy of over 92%. These findings demonstrate how machine learning models can assist investors and traders of cryptocurrencies in making wise/informed decisions in a very volatile market.
+Index Terms:
+Machine learning, Bitcoin price movement, classification models, market predictions, XGBoost, technical indicators.
+I
+Introduction
+The cryptocurrency market has experienced explosive growth in recent years, transforming stock trading into an attractive financial option for investors because of its high profitability and accessible entry. However, investing in stocks has inherent risks, highlighting the importance of developing a well-defined investment plan/strategy. Traditionally, investors relied on empirical approaches (e.g., technical analysis) guided by financial expertise. Yet, with the widespread integration of financial technology (FinTech), statistical inference models have emerged, leveraging machine learning techniques for forecasting/predicting stock price movements. This change in approach has demonstrated notable success across various stock markets, including the S&P 500, NASDAQ
+[
+1
+]
+, and cryptocurrency market
+[
+2
+,
+3
+]
+.
+This research focuses on the dynamic and rapidly evolving cryptocurrency market, particularly on Bitcoin price prediction
+[
+4
+]
+. The choice of this focus is motivated by several factors. Firstly, the cryptocurrency market represents a frontier in financial innovation, challenging traditional currency and value storage notions. Secondly, the underlying blockchain technology powering cryptocurrencies has garnered significant attention from the banking and financial sectors due to its potential to revolutionize transaction processing and data management
+[
+5
+]
+.
+Despite the numerous advantages of the cryptocurrency market, including abundant market data and continuous trading, it presents unique challenges that warrant in-depth investigation. These challenges include:
+1.
+High price volatility: Cryptocurrency prices are subject to rapid and significant fluctuations, making accurate prediction particularly challenging.
+2.
+Relatively small market capitalization: Compared to traditional financial markets, the cryptocurrency market’s smaller size can increase susceptibility to market manipulation and external influences.
+3.
+Data analysis complexity: While data accessibility is universal in cryptocurrency trading, success hinges on effectively analyzing and selecting relevant information from vast datasets.
+The primary challenge in cryptocurrency trading lies in distinguishing between successful/profitable and unsuccessful/unprofitable trades in this complex environment. Consequently, developing sophisticated machine learning models capable of extracting meaningful insights from available data is paramount. Moreover, the increased price volatility inherent to cryptocurrencies adds a layer of complexity to price forecasting efforts.
+Machine learning models, such as Long Short-Term Memory (LSTM) networks and Random Forests (RF)
+[
+3
+]
+, have emerged as powerful tools in addressing these challenges, particularly in predicting cryptocurrency prices. These models leverage historical data and identify complex patterns to make informed predictions, thereby contributing to more effective decision-making in the dynamic landscape of cryptocurrency trading.
+1. Research Problem
+2. Data Collection
+3. Feature Engineering
+4. Data Preprocessing
+5. Feature Selection
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+6. Training XGBoost
+7. Evaluation
+8. Results Analysis
+Figure 1
+:
+Research process diagram.
+Figure
+1
+illustrates the research process, starting with the identification of the research problem, followed by data collection and preprocessing. After data preprocessing, feature engineering is performed, followed by feature selection using the chi-squared (
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+) test.
+The selected features are used to train the model, which is then evaluated. The evaluation results may lead to retraining the model based on feedback. Finally, the results are analyzed and conclusions drawn.
+Figure
+1
+illustrates the research process, starting with the identification of the research problem, followed by data collection and feature engineering. After feature engineering, data preprocessing is performed, followed by feature selection using the chi-squared (
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+) test.
+The selected features are used to train the model, which is then evaluated. The evaluation results may lead to retraining the model based on feedback. Finally, the results are analyzed and conclusions drawn.
+This paper makes several contributions to the field of cryptocurrency price prediction, outlined as follows:
+•
+We propose a robust machine learning strategy utilizing the XGBoost model, which generates accurate buy and sell signals. We fine-tune the XGBoost model across various parameters to select the most optimal accuracy while addressing potential overfitting through regularization techniques. Additionally, we compare the performance of this model with a fine-tuned Logistic Regression model, highlighting XGBoost’s advantages in terms of classification accuracy and robustness.
+•
+We identify and analyze critical features encompassing various technical indicators and historical data, such as RSI, MACD, MOM, %K, %D, and CCI.
+•
+We employ the chi-squared (
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+) statistical test to select the most important features that significantly contribute to the model’s accuracy. Our analysis highlights the top 8 features: RSI30, MACD, MOM30, %D30, %D200, %K200, %K30, and RSI14.
+•
+We demonstrate the balanced nature of our dataset with an approximately equal number of buy and sell signals, validating the use of accuracy as a reliable performance metric for our model.
+•
+We provide a detailed comparison and discussion of the feature importance scores, emphasizing the critical role of selected features in predicting Bitcoin prices.
+The rest of the paper is organized as follows: Section
+II
+presents related work. Section
+III
+explains how we collected and prepared the data and describes the feature engineering process. Section
+IV
+proposes the machine learning model and its mathematical formulation. In Section
+V
+, we assess and compare our proposed model with existing ones. Section
+VI
+compares this paper with existing works. Finally, Section
+VII
+concludes the paper.
+II
+Related Work
+The rapid evolution and growth of the cryptocurrency market, characterized by high volatility and lack of regulation, poses significant challenges and opportunities for developing effective trading strategies. Despite its growing importance, a limited number of studies have focused on building reliable/profitable trading strategies within this market. This section reviews and summarizes the current literature, emphasizing key advancements and methodologies that utilize machine learning models for forecasting and trading, both in traditional financial assets (e.g., stocks
+[
+6
+]
+) and cryptocurrencies (e.g., Bitcoin
+[
+4
+]
+and Ethereum
+[
+7
+]
+).
+In 2017, Shynkevich et al.
+[
+8
+]
+asserted that developing an accurate predictive system to forecast future changes in stock prices is vital for investment management and algorithmic trading. Their study investigates how the combination of forecast horizon and input window length for variable horizon forecasting affects the predictive system’s performance. Machine learning algorithms utilize technical indicators as input features to forecast future movements in stock prices. The dataset comprises ten years of daily price time series for fifty stocks. The optimal prediction performance is observed when the input window length is approximately equal to the forecast horizon. This distinct pattern is analyzed using multiple performance metrics, including prediction accuracy, winning rate, return per trade, and Sharpe ratio.
+Lin et al.
+[
+9
+]
+presented an advanced trading strategy using a Recurrent Neural Network (RNN) to forecast stock prices, specifically focusing on the opening and closing prices and their differences for the S&P 500 and Dow Jones indices. By incorporating data pre-processing techniques such as the normalized first-order difference method and zero-crossing rate (ZCR), the model enhances the accuracy of its predictions. Results show that this approach performs better than previous methods, with metrics including a Root Mean Squared Error (RMSE) of 12.933, a Mean Absolute Error (MAE) of 10.44, and an accuracy of 59.4%. The study concludes that the RNN-based method provides crucial/valuable insights for market strategies, with plans to integrate Natural Language Processing (NLP) and statistical methods to improve the model’s performance further
+[
+9
+]
+.
+Liu et al.
+[
+2
+]
+constructed a feature system with 40 determinants affecting Bitcoin’s price, considering factors such as the cryptocurrency market (e.g., trading volume), public attention, and the macroeconomic environment (e.g., the exchange rate of the US dollar). The authors applied the stacked denoising autoencoders (SDAE) deep learning method for price prediction. Comparative analysis with established methods like backpropagation neural network (BPNN) and support vector regression (SVR) revealed superior performance by the SDAE model in directional and level predictions. Evaluation metrics, including mean absolute percentage error (MAPE), RMSE, and directional accuracy (DA), consistently favored the SDAE model. This underscores the efficacy of the SDAE approach in forecasting Bitcoin prices, surpassing widely recognized benchmark methods
+[
+2
+]
+.
+Passalis et al.
+[
+10
+]
+introduced a novel temporal-aware neural bag-of-features (BoF) model adapted for time-series forecasting using high-frequency limit order book data. Limit order book data, which provides comprehensive insights into stock behavior, presents challenges such as high dimensionality and large volume. The proposed temporal BoF model addresses these challenges by utilizing radial basis function (RBF) and accumulation layers to capture both short-term and long-term dynamics in the data. This enhances the model’s ability to forecast complex temporal patterns. The model’s effectiveness is validated with a large-scale dataset containing over 4.5 million limit orders, demonstrating superior performance compared to other methods. Key metrics achieved include a precision of 46.01, recall of 56.21, F1 score of 45.46, and Cohen’s
+κ
+𝜅
+\kappa
+italic_κ
+of 0.2222 for a short-term horizon of 10 (as shown in Table 3 of
+[
+10
+]
+). Future research directions include extending the method for interactive exploratory analysis and improving its robustness to distribution shifts through multi-scale training schemes and integration with recurrent models to enhance its dynamic modeling capacity
+[
+10
+]
+.
+Jaquart et al.
+[
+11
+]
+utilized a variety of machine learning models to forecast and trade in the daily cryptocurrency market. These models are trained to predict whether the market movements of the top 100 cryptocurrencies will rise or fall daily. Data streaming is facilitated from CoinGecko
+[
+12
+]
+. The findings indicate that all models yield statistically significant predictions, with average accuracy rates ranging from 52.9% to 54.1% across all cryptocurrencies. Notably, when focusing on predictions with the highest 10% model confidences per class and day, accuracy rates increase from 57.5% to 59.5%.
+Furthermore, the authors observe that employing a long-short portfolio strategy based on predictions from ensemble models utilizing LSTM and Gated Recurrent Unit (GRU) architectures results in annualized out-of-sample Sharpe ratios of 3.23 and 3.12, respectively, after accounting for transaction costs. In contrast, a buy-and-hold benchmark market portfolio strategy only yields a Sharpe ratio (SR) of 1.33. These findings suggest a departure from weak-form efficiency in the cryptocurrency market, although the impact of certain arbitrage constraints remains a consideration
+[
+11
+]
+.
+Saad et al.
+[
+13
+]
+delved into the network dynamics of cryptocurrencies to understand the factors driving their price hikes. Analyzing user and network activity, they identified key indicators influencing price fluctuations. Their approach integrates economic theories with machine learning methods to construct accurate price prediction models for Bitcoin
+[
+4
+]
+and Ethereum
+[
+14
+]
+. Experimental results using large datasets validated their models, achieving up to 99% accuracy in price prediction. Their research contributes insights into the network features shaping cryptocurrency prices and advances predictive modeling in this domain.
+Akyildirim et al.
+[
+15
+]
+analyzed the ability to predict price movements of the twelve most traded cryptocurrencies. The authors utilized machine learning algorithms such as SVMs (Support Vector Machines), logistic regression, ANN (Artificial Neural Networks), and random forests. These algorithms leverage historical price data and technical indicators as features to forecast/predict future prices. On average, all four algorithms achieve classification accuracy of over 50% for all cryptocurrencies and periods. This suggests that there is some predictability in cryptocurrency price trends. At both daily and minute intervals, machine learning algorithms achieve predictive accuracies ranging from 55% to 65%. Among these, SVMs consistently demonstrate superior predictive accuracy compared to other algorithms, including logistic regression, ANN, and random forests
+[
+15
+]
+.
+Recently, Hafid et al.
+[
+3
+]
+introduced a machine learning classification approach to predict market trends, discerning their upward or downward movement. The authors identify key features, incorporating historical data such as volume, and utilize technical indicators such as the Relative Strength Index (RSI), Moving Average Convergence Divergence (MACD), and Exponential Moving Average (EMA) as inputs for the Random Forest classifier. The proposed approach is validated by comprehensively analyzing Bitcoin’s closing prices. Data streaming is facilitated from Binance via the Binance API
+[
+16
+]
+. The authors employ various simulations during the evaluation, including a backtesting strategy. The results demonstrate that their machine learning method effectively signals optimal moments for buying or selling, achieving an accuracy of 86%.
+In a more recent study, Roy et al.
+[
+17
+]
+utilized a Yahoo finance dataset from 2016 to 2021 to train an LSTM model, achieving impressive metrics: MAE of 253.30, RMSE of 409.41, and
+R
+2
+superscript
+𝑅
+2
+R^{2}
+italic_R start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+of 0.9987 (as shown in Table 2 of
+[
+17
+]
+). This model outperformed Bi-LSTM and GRU variants, demonstrating its robustness in minimizing prediction errors. The findings highlight the potential of LSTM models in providing reliable buy and sell signals, thereby assisting investors in making informed decisions in the volatile cryptocurrency market. The study also suggests future enhancements by incorporating advanced machine learning techniques and diverse data sources such as sentiment analysis, which could further improve prediction accuracy and model interpretability
+[
+17
+]
+.
+III
+Data Collection, Preprocessing and Feature Engineering
+In this section, we describe the data collection, preprocessing, as well as feature engineering process. The list of our abbreviations and notations is provided in Table
+I
+.
+TABLE I
+:
+Nomenclature and Definitions.
+Notation
+Description
+m
+𝑚
+m
+italic_m
+Total number of samples or observations
+m
+train
+subscript
+𝑚
+train
+m_{\text{train}}
+italic_m start_POSTSUBSCRIPT train end_POSTSUBSCRIPT
+Number of training samples
+m
+test
+subscript
+𝑚
+test
+m_{\text{test}}
+italic_m start_POSTSUBSCRIPT test end_POSTSUBSCRIPT
+Number of testing samples
+n
+𝑛
+n
+italic_n
+Number of features
+𝒞
+p
+(
+i
+)
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+\mathcal{C}_{p}^{(i)}
+caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Closing price of the current period
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+𝒪
+p
+(
+i
+)
+superscript
+subscript
+𝒪
+𝑝
+𝑖
+\mathcal{O}_{p}^{(i)}
+caligraphic_O start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Opening price of the current period
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+ℋ
+p
+(
+i
+)
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+\mathcal{H}_{p}^{(i)}
+caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Highest price of the current period
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+ℒ
+p
+(
+i
+)
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+\mathcal{L}_{p}^{(i)}
+caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Lowest price of the current period
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+𝒱
+(
+i
+)
+superscript
+𝒱
+𝑖
+\mathcal{V}^{(i)}
+caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Volume of the cryptocurrency being traded at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+QAV
+(
+i
+)
+superscript
+QAV
+𝑖
+\text{QAV}^{(i)}
+QAV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Total trading value at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+NOT
+(
+i
+)
+superscript
+NOT
+𝑖
+\text{NOT}^{(i)}
+NOT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Number of trades at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+TBBV
+(
+i
+)
+superscript
+TBBV
+𝑖
+\text{TBBV}^{(i)}
+TBBV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Total volume of Bitcoin bought at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+RSI
+τ
+(
+i
+)
+superscript
+subscript
+RSI
+𝜏
+𝑖
+\text{RSI}_{\tau}^{(i)}
+RSI start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Relative strength index at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a time period
+τ
+𝜏
+\tau
+italic_τ
+MACD
+(
+i
+)
+superscript
+MACD
+𝑖
+\text{MACD}^{(i)}
+MACD start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Moving average convergence divergence at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+EMA
+τ
+(
+i
+)
+superscript
+subscript
+EMA
+𝜏
+𝑖
+\text{EMA}_{\tau}^{(i)}
+EMA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Exponential moving average at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+PROC
+τ
+(
+i
+)
+superscript
+subscript
+PROC
+𝜏
+𝑖
+\text{PROC}_{\tau}^{(i)}
+PROC start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Price rate of change at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+%
+K
+τ
+(
+i
+)
+\%K_{\tau}^{(i)}
+% italic_K start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Stochastic oscillator at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+%
+D
+τ
+(
+i
+)
+\%D_{\tau}^{(i)}
+% italic_D start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Smoothed stochastic oscillator at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+MOM
+τ
+(
+i
+)
+superscript
+subscript
+MOM
+𝜏
+𝑖
+\text{MOM}_{\tau}^{(i)}
+MOM start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Momentum at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+BB
+τ
+(
+i
+)
+superscript
+subscript
+BB
+𝜏
+𝑖
+\text{BB}_{\tau}^{(i)}
+BB start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Bollinger Bands at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+ATR
+τ
+(
+i
+)
+superscript
+subscript
+ATR
+𝜏
+𝑖
+\text{ATR}_{\tau}^{(i)}
+ATR start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Average True Range at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+CCI
+τ
+(
+i
+)
+superscript
+subscript
+CCI
+𝜏
+𝑖
+\text{CCI}_{\tau}^{(i)}
+CCI start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Commodity Channel Index at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+%R
+τ
+(
+i
+)
+superscript
+subscript
+%R
+𝜏
+𝑖
+\text{\%R}_{\tau}^{(i)}
+%R start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Williams %R indicator value at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+CMF
+τ
+(
+i
+)
+superscript
+subscript
+CMF
+𝜏
+𝑖
+\text{CMF}_{\tau}^{(i)}
+CMF start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Chaikin Money Flow at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+within a period of time
+τ
+𝜏
+\tau
+italic_τ
+OBV
+(
+i
+)
+superscript
+OBV
+𝑖
+\text{OBV}^{(i)}
+OBV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+On-balance Volume at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+ADL
+(
+i
+)
+superscript
+ADL
+𝑖
+\text{ADL}^{(i)}
+ADL start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Accumulation/Distribution line at time
+t
+i
+subscript
+𝑡
+𝑖
+t_{i}
+italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+K
+𝐾
+K
+italic_K
+Total number of trees in the ensemble
+η
+𝜂
+\eta
+italic_η
+Learning rate
+λ
+𝜆
+\lambda
+italic_λ
+,
+α
+𝛼
+\alpha
+italic_α
+Regularization parameters
+N
+𝑁
+N
+italic_N
+Number of trees
+Δ
+⁢
+t
+Δ
+𝑡
+\Delta t
+roman_Δ italic_t
+Time interval
+s
+𝑠
+s
+italic_s
+Span (
+s
+≥
+1
+𝑠
+1
+s\geq 1
+italic_s ≥ 1
+)
+III-A
+Data Collection
+We obtain Bitcoin historical market data from Binance via Binance API
+[
+16
+]
+. The dataset covers the period from February 1, 2021, to February 1, 2022, with a time interval of 15 minutes (i.e.,
+Δ
+⁢
+t
+Δ
+𝑡
+\Delta t
+roman_Δ italic_t
+=
+15
+15
+15
+15
+minutes). We chose
+15
+15
+15
+15
+minutes because it gives us good accuracy. We split the data into
+80
+%
+percent
+80
+80\%
+80 %
+for the training set and
+20
+%
+percent
+20
+20\%
+20 %
+for the testing set.
+We choose this shorter time interval for several reasons, including the high volatility of the Bitcoin market. In highly volatile markets, shorter intervals are often preferred to capture rapid changes, whereas less volatile markets may be suitable for longer intervals. Additionally, our choice aligns with the time intervals used in existing works for meaningful comparisons.
+Figure 2
+:
+Close price of Bitcoin from February 1, 2021, to February 1, 2022, showing trends and fluctuations over the selected timeframe.
+Figure
+2
+shows the trend of Bitcoin’s closing prices from February 1, 2021, to February 1, 2022, with a time interval of 15 minutes. The x-axis represents the ”Close Time,” indicating the specific times at which the Bitcoin prices were recorded. In contrast, the y-axis represents the ”Close Price” regarding Bitcoin’s value at those respective times. Each data point on the plot is marked with a circular marker, helping to visualize the fluctuations and trends in Bitcoin prices. This figure clearly represents the volatility and trends in Bitcoin’s market value over the selected timeframe.
+III-B
+Feature Engineering and Preprocessing
+This section illustrates the various features incorporated in this case study. Specifically, we employ historical market data alongside technical indicators. Additionally, we preprocess our dataset.
+III-B
+1
+Historical Data
+In the context of historical data analysis, we focus on the closing price and volume.
+III-B
+2
+Technical Indicators
+Technical analysis indicators represent a trading discipline utilized to assess investments and pinpoint trading opportunities by analyzing statistical trends derived from trading activities, including price movements and volume
+[
+18
+]
+.
+In this study, we incorporate various technical indicators such as the exponential moving average, moving average convergence divergence, relative strength index, momentum, price rate of change, and stochastic oscillator (all these technical indicators are well described and mathematically formalized in
+[
+3
+]
+).
+Additionally, we implement further technical indicators, including Bollinger Bands, Average True Range, Commodity Channel Index, Williams %R, and Chaikin Money Flow.
+Bollinger Bands
+Bollinger Bands (BB) are a volatility indicator that consists of a moving average (MA) and two standard deviation lines (BB_up and BB_dn) above and below the moving average. They help identify overbought and oversold conditions
+[
+19
+]
+. This indicator can be formulated as follows:
+MA
+τ
+(
+i
+)
+superscript
+subscript
+MA
+𝜏
+𝑖
+\displaystyle\text{MA}_{\tau}^{(i)}
+MA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+1
+τ
+⁢
+∑
+j
+=
+0
+τ
+−
+1
+𝒞
+p
+(
+j
+)
+absent
+1
+𝜏
+superscript
+subscript
+𝑗
+0
+𝜏
+1
+superscript
+subscript
+𝒞
+𝑝
+𝑗
+\displaystyle=\frac{1}{\tau}\sum_{j=0}^{\tau-1}\mathcal{C}_{p}^{(j)}
+= divide start_ARG 1 end_ARG start_ARG italic_τ end_ARG ∑ start_POSTSUBSCRIPT italic_j = 0 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_τ - 1 end_POSTSUPERSCRIPT caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_j ) end_POSTSUPERSCRIPT
+BB
+up
+,
+τ
+(
+i
+)
+superscript
+subscript
+BB
+up
+𝜏
+𝑖
+\displaystyle\text{BB}_{\text{up},\tau}^{(i)}
+BB start_POSTSUBSCRIPT up , italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+MA
+τ
+(
+i
+)
++
+2
+×
+σ
+⁢
+(
+𝒞
+p
+(
+i
+)
+)
+absent
+superscript
+subscript
+MA
+𝜏
+𝑖
+2
+𝜎
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+\displaystyle=\text{MA}_{\tau}^{(i)}+2\times\sigma(\mathcal{C}_{p}^{(i)})
+= MA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT + 2 × italic_σ ( caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT )
+BB
+dn
+,
+τ
+(
+i
+)
+superscript
+subscript
+BB
+dn
+𝜏
+𝑖
+\displaystyle\text{BB}_{\text{dn},\tau}^{(i)}
+BB start_POSTSUBSCRIPT dn , italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+MA
+τ
+(
+i
+)
+−
+2
+×
+σ
+⁢
+(
+𝒞
+p
+(
+i
+)
+)
+absent
+superscript
+subscript
+MA
+𝜏
+𝑖
+2
+𝜎
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+\displaystyle=\text{MA}_{\tau}^{(i)}-2\times\sigma(\mathcal{C}_{p}^{(i)})
+= MA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - 2 × italic_σ ( caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT )
+Where
+σ
+⁢
+(
+𝒞
+p
+(
+i
+)
+)
+𝜎
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+\sigma(\mathcal{C}_{p}^{(i)})
+italic_σ ( caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT )
+is the standard deviation of the closing prices over the period
+τ
+𝜏
+\tau
+italic_τ
+(
+τ
+=
+20
+𝜏
+20
+\tau=20
+italic_τ = 20
+in this case study).
+Average True Range
+The Average True Range (ATR) is a measure of market volatility. It calculates the average of the true range over a specified period (e.g., 14 days)
+[
+20
+]
+. The mathematical formula for the
+ATR
+indicator is given by:
+First, calculate the True Range (
+TR
+) for each period
+t
+𝑡
+t
+italic_t
+:
+TR
+(
+i
+)
+=
+max
+⁡
+(
+ℋ
+p
+(
+i
+)
+−
+ℒ
+p
+(
+i
+)
+,
+|
+ℋ
+p
+(
+i
+)
+−
+𝒞
+p
+(
+i
+−
+1
+)
+|
+,
+|
+ℒ
+p
+(
+i
+)
+−
+𝒞
+p
+(
+i
+−
+1
+)
+|
+)
+superscript
+TR
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+1
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+1
+\text{TR}^{(i)}=\max(\mathcal{H}_{p}^{(i)}-\mathcal{L}_{p}^{(i)},|\mathcal{H}_%
+{p}^{(i)}-\mathcal{C}_{p}^{(i-1)}|,|\mathcal{L}_{p}^{(i)}-\mathcal{C}_{p}^{(i-%
+1)}|)
+TR start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = roman_max ( caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT , | caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT | , | caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT | )
+Then, calculate the (
+ATR
+) over a specified number of periods
+τ
+𝜏
+\tau
+italic_τ
+:
+ATR
+τ
+(
+i
+)
+=
+1
+τ
+⁢
+∑
+i
+=
+1
+τ
+TR
+(
+i
+)
+superscript
+subscript
+ATR
+𝜏
+𝑖
+1
+𝜏
+superscript
+subscript
+𝑖
+1
+𝜏
+superscript
+TR
+𝑖
+\text{ATR}_{\tau}^{(i)}=\frac{1}{\tau}\sum_{i=1}^{\tau}\text{TR}^{(i)}
+ATR start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = divide start_ARG 1 end_ARG start_ARG italic_τ end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_τ end_POSTSUPERSCRIPT TR start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Commodity Channel Index
+The Commodity Channel Index (CCI) measures a security’s price variation from its average price. High positive values indicate overbought conditions, while low negative values indicate oversold conditions
+[
+21
+]
+. This indicator is defined as follows:
+TP
+=
+ℋ
+p
+(
+i
+)
++
+ℒ
+p
+(
+i
+)
++
+𝒞
+p
+(
+i
+)
+3
+absent
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+3
+\displaystyle=\frac{\mathcal{H}_{p}^{(i)}+\mathcal{L}_{p}^{(i)}+\mathcal{C}_{p%
+}^{(i)}}{3}
+= divide start_ARG caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT + caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT + caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG start_ARG 3 end_ARG
+SMA
+τ
+⁢
+(
+TP
+)
+subscript
+SMA
+𝜏
+TP
+\displaystyle\text{SMA}_{\tau}(\text{TP})
+SMA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT ( TP )
+=
+1
+τ
+⁢
+∑
+i
+=
+0
+τ
+−
+1
+TP
+i
+absent
+1
+𝜏
+superscript
+subscript
+𝑖
+0
+𝜏
+1
+subscript
+TP
+𝑖
+\displaystyle=\frac{1}{\tau}\sum_{i=0}^{\tau-1}\text{TP}_{i}
+= divide start_ARG 1 end_ARG start_ARG italic_τ end_ARG ∑ start_POSTSUBSCRIPT italic_i = 0 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_τ - 1 end_POSTSUPERSCRIPT TP start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+MAD
+τ
+subscript
+MAD
+𝜏
+\displaystyle\text{MAD}_{\tau}
+MAD start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT
+=
+1
+τ
+⁢
+∑
+i
+=
+0
+τ
+−
+1
+|
+TP
+i
+−
+SMA
+⁢
+τ
+⁢
+(
+TP
+)
+|
+absent
+1
+𝜏
+superscript
+subscript
+𝑖
+0
+𝜏
+1
+subscript
+TP
+𝑖
+SMA
+𝜏
+TP
+\displaystyle=\frac{1}{\tau}\sum_{i=0}^{\tau-1}|\text{TP}_{i}-\text{SMA}{\tau}%
+(\text{TP})|
+= divide start_ARG 1 end_ARG start_ARG italic_τ end_ARG ∑ start_POSTSUBSCRIPT italic_i = 0 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_τ - 1 end_POSTSUPERSCRIPT | TP start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT - SMA italic_τ ( TP ) |
+CCI
+τ
+(
+i
+)
+superscript
+subscript
+CCI
+𝜏
+𝑖
+\displaystyle\text{CCI}_{\tau}^{(i)}
+CCI start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+TP
+−
+SMA
+τ
+⁢
+(
+TP
+)
+0.015
+×
+MAD
+τ
+absent
+TP
+subscript
+SMA
+𝜏
+TP
+0.015
+subscript
+MAD
+𝜏
+\displaystyle=\frac{\text{TP}-\text{SMA}_{\tau}(\text{TP})}{0.015\times\text{%
+MAD}_{\tau}}
+= divide start_ARG TP - SMA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT ( TP ) end_ARG start_ARG 0.015 × MAD start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT end_ARG
+Where
+TP
+denotes the Typical Price, computed as the arithmetic mean of the High, Low, and Close prices;
+SMA
+τ
+⁢
+(
+TP
+)
+subscript
+SMA
+𝜏
+TP
+\text{SMA}_{\tau}(\text{TP})
+SMA start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT ( TP )
+represents the Simple Moving Average of the Typical Price over a specified period
+τ
+𝜏
+\tau
+italic_τ
+, and
+MAD
+τ
+subscript
+MAD
+𝜏
+\text{MAD}_{\tau}
+MAD start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT
+signifies the Mean Absolute Deviation of the Typical Price over the same period
+τ
+𝜏
+\tau
+italic_τ
+.
+Williams %R
+The Williams %R is a momentum indicator that measures the level of the close relative to the highest high for the look-back period. It helps to identify overbought and oversold conditions
+[
+22
+]
+. This indicator can be formulated as follows:
+%
+R
+\displaystyle\%R
+% italic_R
+=
+−
+100
+×
+Highest High
+τ
+−
+Close
+Highest High
+τ
+−
+Lowest Low
+τ
+absent
+100
+subscript
+Highest High
+𝜏
+Close
+subscript
+Highest High
+𝜏
+subscript
+Lowest Low
+𝜏
+\displaystyle=-100\times\frac{\text{Highest High}_{\tau}-\text{Close}}{\text{%
+Highest High}_{\tau}-\text{Lowest Low}_{\tau}}
+= - 100 × divide start_ARG Highest High start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT - Close end_ARG start_ARG Highest High start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT - Lowest Low start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT end_ARG
+%R
+τ
+(
+i
+)
+superscript
+subscript
+%R
+𝜏
+𝑖
+\displaystyle\text{\%R}_{\tau}^{(i)}
+%R start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+−
+100
+×
+Highest High
+τ
+−
+𝒞
+p
+(
+i
+)
+Highest High
+τ
+−
+Lowest Low
+τ
+absent
+100
+subscript
+Highest High
+𝜏
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+subscript
+Highest High
+𝜏
+subscript
+Lowest Low
+𝜏
+\displaystyle=-100\times\frac{\text{Highest High}_{\tau}-\mathcal{C}_{p}^{(i)}%
+}{\text{Highest High}_{\tau}-\text{Lowest Low}_{\tau}}
+= - 100 × divide start_ARG Highest High start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT - caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG start_ARG Highest High start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT - Lowest Low start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT end_ARG
+where:
+•
+Highest High
+n
+subscript
+Highest High
+𝑛
+\text{Highest High}_{n}
+Highest High start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPT
+is the highest high over the past
+n
+𝑛
+n
+italic_n
+periods.
+•
+Lowest Low
+n
+subscript
+Lowest Low
+𝑛
+\text{Lowest Low}_{n}
+Lowest Low start_POSTSUBSCRIPT italic_n end_POSTSUBSCRIPT
+is the lowest low over the past
+n
+𝑛
+n
+italic_n
+periods.
+•
+Close
+is the closing price of the current period.
+Chaikin Money Flow
+The Chaikin Money Flow (CMF) is an indicator that measures the accumulation and distribution of a security over a specified period. It is calculated using the Money Flow Multiplier and the Money Flow Volume over the period. This indicator is defined as follows:
+MFV
+(
+i
+)
+superscript
+MFV
+𝑖
+\displaystyle\text{MFV}^{(i)}
+MFV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+=
+(
+𝒞
+p
+(
+i
+)
+−
+ℒ
+p
+(
+i
+)
+)
+−
+(
+ℋ
+p
+(
+i
+)
+−
+𝒞
+p
+(
+i
+)
+)
+ℋ
+p
+(
+i
+)
+−
+ℒ
+p
+(
+i
+)
+×
+𝒱
+(
+i
+)
+absent
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+𝒱
+𝑖
+\displaystyle=\frac{(\mathcal{C}_{p}^{(i)}-\mathcal{L}_{p}^{(i)})-(\mathcal{H}%
+_{p}^{(i)}-\mathcal{C}_{p}^{(i)})}{\mathcal{H}_{p}^{(i)}-\mathcal{L}_{p}^{(i)}%
+}\times\mathcal{V}^{(i)}
+= divide start_ARG ( caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ) - ( caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ) end_ARG start_ARG caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG × caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+CMF
+τ
+subscript
+CMF
+𝜏
+\displaystyle\text{CMF}_{\tau}
+CMF start_POSTSUBSCRIPT italic_τ end_POSTSUBSCRIPT
+=
+∑
+t
+=
+1
+n
+MFV
+(
+i
+)
+∑
+t
+=
+1
+n
+𝒱
+(
+i
+)
+absent
+superscript
+subscript
+𝑡
+1
+𝑛
+superscript
+MFV
+𝑖
+superscript
+subscript
+𝑡
+1
+𝑛
+superscript
+𝒱
+𝑖
+\displaystyle=\frac{\sum_{t=1}^{n}\text{MFV}^{(i)}}{\sum_{t=1}^{n}\mathcal{V}^%
+{(i)}}
+= divide start_ARG ∑ start_POSTSUBSCRIPT italic_t = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_n end_POSTSUPERSCRIPT MFV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG start_ARG ∑ start_POSTSUBSCRIPT italic_t = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_n end_POSTSUPERSCRIPT caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG
+On-balance Volume
+The on-balance volume (OBV) is a technical trading momentum indicator that uses volume flow to predict changes in stock price. The OBV is calculated by adding volume on up days and subtracting it on down days. The cumulative OBV line then provides insight into the strength of a trend
+[
+23
+]
+. This indicator can be defined as follows:
+OBV
+(
+i
+)
+=
+OBV
+(
+i
+−
+1
+)
++
+{
+𝒱
+(
+i
+)
+if
+⁢
+𝒞
+p
+(
+i
+)
+>
+𝒞
+p
+(
+i
+−
+1
+)
+−
+𝒱
+(
+i
+)
+if
+⁢
+𝒞
+p
+(
+i
+)
+<
+𝒞
+p
+(
+i
+−
+1
+)
+0
+if
+⁢
+𝒞
+p
+(
+i
+)
+=
+𝒞
+p
+(
+i
+−
+1
+)
+superscript
+OBV
+𝑖
+superscript
+OBV
+𝑖
+1
+cases
+superscript
+𝒱
+𝑖
+if
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+1
+superscript
+𝒱
+𝑖
+if
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+1
+0
+if
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+1
+\text{OBV}^{(i)}=\text{OBV}^{(i-1)}+\begin{cases}\mathcal{V}^{(i)}&\text{if }%
+\mathcal{C}_{p}^{(i)}>\mathcal{C}_{p}^{(i-1)}\\
+-\mathcal{V}^{(i)}&\text{if }\mathcal{C}_{p}^{(i)}<\mathcal{C}_{p}^{(i-1)}\\
+0&\text{if }\mathcal{C}_{p}^{(i)}=\mathcal{C}_{p}^{(i-1)}\end{cases}
+OBV start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = OBV start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT + { start_ROW start_CELL caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL start_CELL if caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT > caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL - caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL start_CELL if caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT < caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL 0 end_CELL start_CELL if caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW
+Accumulation/Distribution Line
+The Accumulation/Distribution (A/D) line is a technical indicator that uses volume and price to assess the cumulative flow of money into and out of a security. It measures the supply and demand by evaluating whether investors are accumulating (buying) or distributing (selling) a particular stock
+[
+18
+]
+. This indicator can be expressed as follows:
+ADL
+(
+i
+)
+=
+ADL
+(
+i
+−
+1
+)
++
+(
+(
+𝒞
+p
+(
+i
+)
+−
+ℒ
+p
+(
+i
+)
+)
+−
+(
+ℋ
+p
+(
+i
+)
+−
+𝒞
+p
+(
+i
+)
+)
+ℋ
+p
+(
+i
+)
+−
+ℒ
+p
+(
+i
+)
+)
+×
+𝒱
+(
+i
+)
+superscript
+ADL
+𝑖
+superscript
+ADL
+𝑖
+1
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+superscript
+subscript
+ℋ
+𝑝
+𝑖
+superscript
+subscript
+ℒ
+𝑝
+𝑖
+superscript
+𝒱
+𝑖
+\text{ADL}^{(i)}=\text{ADL}^{(i-1)}+\left(\frac{(\mathcal{C}_{p}^{(i)}-%
+\mathcal{L}_{p}^{(i)})-(\mathcal{H}_{p}^{(i)}-\mathcal{C}_{p}^{(i)})}{\mathcal%
+{H}_{p}^{(i)}-\mathcal{L}_{p}^{(i)}}\right)\times\mathcal{V}^{(i)}
+ADL start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = ADL start_POSTSUPERSCRIPT ( italic_i - 1 ) end_POSTSUPERSCRIPT + ( divide start_ARG ( caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ) - ( caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ) end_ARG start_ARG caligraphic_H start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT - caligraphic_L start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_ARG ) × caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+Signal
+Let
+𝒴
+𝒴
+\mathcal{Y}
+caligraphic_Y
+be a random variable that takes the values of 1 or -1 (
+Buy
+and
+Sell
+, respectively).
+To generate
+Buy
+and
+Sell
+signals, we employ a technical indicator called Moving Average (MA). MA identifies the trend of the market. The MA rule that generates
+Buy
+and
+Sell
+signals at time
+t
+𝑡
+t
+italic_t
+consists of comparing two moving averages. Formally, the rule is expressed as follows:
+𝒴
+⁢
+(
+t
+i
+)
+=
+{
+1
+if
+MA
+s
+,
+t
+i
+≥
+MA
+l
+,
+t
+i
+,
+−
+1
+if
+MA
+s
+,
+t
+i
+<
+MA
+l
+,
+t
+i
+𝒴
+subscript
+𝑡
+𝑖
+cases
+1
+subscript
+if
+MA
+𝑠
+subscript
+𝑡
+𝑖
+subscript
+MA
+𝑙
+subscript
+𝑡
+𝑖
+1
+subscript
+if
+MA
+𝑠
+subscript
+𝑡
+𝑖
+subscript
+MA
+𝑙
+subscript
+𝑡
+𝑖
+\mathcal{Y}(t_{i})=\begin{cases}1&\mbox{if }\text{MA}_{s,t_{i}}\geq\text{MA}_{%
+l,t_{i}},\\
+-1&\mbox{if }\text{MA}_{s,t_{i}}<\text{MA}_{l,t_{i}}\end{cases}
+caligraphic_Y ( italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) = { start_ROW start_CELL 1 end_CELL start_CELL if roman_MA start_POSTSUBSCRIPT italic_s , italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_POSTSUBSCRIPT ≥ MA start_POSTSUBSCRIPT italic_l , italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_POSTSUBSCRIPT , end_CELL end_ROW start_ROW start_CELL - 1 end_CELL start_CELL if roman_MA start_POSTSUBSCRIPT italic_s , italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_POSTSUBSCRIPT < MA start_POSTSUBSCRIPT italic_l , italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_POSTSUBSCRIPT end_CELL end_ROW
+(1)
+where
+MA
+j
+,
+t
+i
+=
+(
+1
+/
+j
+)
+⁢
+∑
+k
+=
+0
+j
+−
+1
+𝒞
+p
+(
+i
+−
+k
+)
+,
+for
+⁢
+j
+=
+s
+⁢
+or
+⁢
+l
+;
+formulae-sequence
+subscript
+MA
+𝑗
+subscript
+𝑡
+𝑖
+1
+𝑗
+superscript
+subscript
+𝑘
+0
+𝑗
+1
+superscript
+subscript
+𝒞
+𝑝
+𝑖
+𝑘
+for
+𝑗
+𝑠
+or
+𝑙
+\text{MA}_{j,t_{i}}=(1/j)\sum_{k=0}^{j-1}\mathcal{C}_{p}^{(i-k)},\hskip 7.1131%
+7pt\text{for}\hskip 4.26773ptj=s\hskip 4.26773pt\text{or}\hskip 4.26773ptl;
+MA start_POSTSUBSCRIPT italic_j , italic_t start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_POSTSUBSCRIPT = ( 1 / italic_j ) ∑ start_POSTSUBSCRIPT italic_k = 0 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_j - 1 end_POSTSUPERSCRIPT caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i - italic_k ) end_POSTSUPERSCRIPT , for italic_j = italic_s or italic_l ;
+(2)
+s
+(
+l
+) is the length of the short (long) MA (
+s
+<
+l
+s
+l
+\textit{s}<\textit{l}
+s < l
+). We denote the
+MA indicator with MA lengths
+s
+and
+l
+by MA(
+s
+,
+l
+). In this paper, we consider the MA(10, 60) because of it high accuracy.
+Figure 3
+:
+Number of Buy and Sell signals.
+Figure
+3
+shows the close price chart indicating the number of Buy and Sell signals. The approximately equal distribution of Buy and Sell signals benefits classification machine learning problems, implying a balanced dataset. Consequently, accuracy can be considered a reliable measure for evaluating the model’s performance.
+III-B
+3
+Data Preprocessing
+We scale the data by using the
+StandardScaler
+from
+sklearn.preprocessing
+module. Let’s denote the elements of the matrix
+X
+𝑋
+X
+italic_X
+as
+x
+i
+⁢
+j
+subscript
+𝑥
+𝑖
+𝑗
+x_{ij}
+italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+, where
+i
+𝑖
+i
+italic_i
+represents the row index (sample) and
+j
+𝑗
+j
+italic_j
+represents the column index (feature). The transformation applied by the
+StandardScaler
+to each feature
+j
+𝑗
+j
+italic_j
+is as follows: 1) Compute the mean (
+μ
+j
+=
+1
+m
+⁢
+∑
+i
+=
+1
+m
+x
+i
+⁢
+j
+subscript
+𝜇
+𝑗
+1
+𝑚
+superscript
+subscript
+𝑖
+1
+𝑚
+subscript
+𝑥
+𝑖
+𝑗
+\mu_{j}=\frac{1}{m}\sum_{i=1}^{m}x_{ij}
+italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT = divide start_ARG 1 end_ARG start_ARG italic_m end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m end_POSTSUPERSCRIPT italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+) and standard deviation (
+σ
+j
+=
+1
+m
+⁢
+∑
+i
+=
+1
+m
+(
+x
+i
+⁢
+j
+−
+μ
+j
+)
+2
+subscript
+𝜎
+𝑗
+1
+𝑚
+superscript
+subscript
+𝑖
+1
+𝑚
+superscript
+subscript
+𝑥
+𝑖
+𝑗
+subscript
+𝜇
+𝑗
+2
+\sigma_{j}=\sqrt{\frac{1}{m}\sum_{i=1}^{m}(x_{ij}-\mu_{j})^{2}}
+italic_σ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT = square-root start_ARG divide start_ARG 1 end_ARG start_ARG italic_m end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m end_POSTSUPERSCRIPT ( italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT - italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT ) start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG
+) of feature
+j
+𝑗
+j
+italic_j
+, where
+m
+𝑚
+m
+italic_m
+is the number of samples (rows),
+x
+i
+⁢
+j
+subscript
+𝑥
+𝑖
+𝑗
+x_{ij}
+italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+is the element at the
+i
+𝑖
+i
+italic_i
+-th row and
+j
+𝑗
+j
+italic_j
+-th column of
+X
+𝑋
+X
+italic_X
+. 2) Apply the transformation to each element of feature
+j
+𝑗
+j
+italic_j
+:
+x
+i
+⁢
+j
+′
+=
+x
+i
+⁢
+j
+−
+μ
+j
+σ
+j
+subscript
+superscript
+𝑥
+′
+𝑖
+𝑗
+subscript
+𝑥
+𝑖
+𝑗
+subscript
+𝜇
+𝑗
+subscript
+𝜎
+𝑗
+x^{\prime}_{ij}=\frac{x_{ij}-\mu_{j}}{\sigma_{j}}
+italic_x start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT = divide start_ARG italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT - italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_ARG start_ARG italic_σ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_ARG
+where
+x
+i
+⁢
+j
+′
+subscript
+superscript
+𝑥
+′
+𝑖
+𝑗
+x^{\prime}_{ij}
+italic_x start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+is the scaled value of
+x
+i
+⁢
+j
+subscript
+𝑥
+𝑖
+𝑗
+x_{ij}
+italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+.
+III-B
+4
+Data Preprocessing
+We scale the data using the
+StandardScaler
+from the
+sklearn.preprocessing
+module. Let’s denote the elements of the matrix
+X
+𝑋
+X
+italic_X
+as
+x
+i
+⁢
+j
+subscript
+𝑥
+𝑖
+𝑗
+x_{ij}
+italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+, where
+i
+𝑖
+i
+italic_i
+represents the row index (sample) and
+j
+𝑗
+j
+italic_j
+represents the column index (feature). The transformation applied by the
+StandardScaler
+to each feature
+j
+𝑗
+j
+italic_j
+is as follows:
+1) Compute the mean (
+μ
+j
+=
+1
+m
+⁢
+∑
+i
+=
+1
+m
+x
+i
+⁢
+j
+subscript
+𝜇
+𝑗
+1
+𝑚
+superscript
+subscript
+𝑖
+1
+𝑚
+subscript
+𝑥
+𝑖
+𝑗
+\mu_{j}=\frac{1}{m}\sum_{i=1}^{m}x_{ij}
+italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT = divide start_ARG 1 end_ARG start_ARG italic_m end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m end_POSTSUPERSCRIPT italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+) and standard deviation (
+σ
+j
+=
+1
+m
+⁢
+∑
+i
+=
+1
+m
+(
+x
+i
+⁢
+j
+−
+μ
+j
+)
+2
+subscript
+𝜎
+𝑗
+1
+𝑚
+superscript
+subscript
+𝑖
+1
+𝑚
+superscript
+subscript
+𝑥
+𝑖
+𝑗
+subscript
+𝜇
+𝑗
+2
+\sigma_{j}=\sqrt{\frac{1}{m}\sum_{i=1}^{m}(x_{ij}-\mu_{j})^{2}}
+italic_σ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT = square-root start_ARG divide start_ARG 1 end_ARG start_ARG italic_m end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m end_POSTSUPERSCRIPT ( italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT - italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT ) start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG
+) of feature
+j
+𝑗
+j
+italic_j
+, where
+m
+𝑚
+m
+italic_m
+is the number of samples (rows).
+2) Apply the transformation to each element of feature
+j
+𝑗
+j
+italic_j
+:
+x
+i
+⁢
+j
+′
+=
+x
+i
+⁢
+j
+−
+μ
+j
+σ
+j
+subscript
+superscript
+𝑥
+′
+𝑖
+𝑗
+subscript
+𝑥
+𝑖
+𝑗
+subscript
+𝜇
+𝑗
+subscript
+𝜎
+𝑗
+x^{\prime}_{ij}=\frac{x_{ij}-\mu_{j}}{\sigma_{j}}
+italic_x start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT = divide start_ARG italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT - italic_μ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_ARG start_ARG italic_σ start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_ARG
+where
+x
+i
+⁢
+j
+′
+subscript
+superscript
+𝑥
+′
+𝑖
+𝑗
+x^{\prime}_{ij}
+italic_x start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+is the scaled value of
+x
+i
+⁢
+j
+subscript
+𝑥
+𝑖
+𝑗
+x_{ij}
+italic_x start_POSTSUBSCRIPT italic_i italic_j end_POSTSUBSCRIPT
+.
+In addition to scaling, the data is split into training and testing sets using a time-series approach. Since the dataset is sequential, a percentage-based split is applied to maintain the temporal order. This ensures that the model is tested on future data, preventing data leakage from the training set. The mathematical formulation for the splitting process is provided in Appendix
+A
+.
+IV
+Mathematical Model
+Let
+(
+x
+(
+i
+)
+,
+y
+(
+i
+)
+)
+superscript
+𝑥
+𝑖
+superscript
+𝑦
+𝑖
+(x^{(i)},y^{(i)})
+( italic_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT , italic_y start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT )
+denotes a single sample/observation, and the set of samples is represented by:
+𝒮
+=
+{
+(
+x
+(
+1
+)
+,
+y
+(
+1
+)
+)
+,
+(
+x
+(
+2
+)
+,
+y
+(
+2
+)
+)
+,
+…
+,
+(
+x
+(
+m
+)
+,
+y
+(
+m
+)
+)
+}
+𝒮
+superscript
+𝑥
+1
+superscript
+𝑦
+1
+superscript
+𝑥
+2
+superscript
+𝑦
+2
+…
+superscript
+𝑥
+𝑚
+superscript
+𝑦
+𝑚
+\mathcal{S}=\left\{(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})\right\}
+caligraphic_S = { ( italic_x start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT , italic_y start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT ) , ( italic_x start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT , italic_y start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT ) , … , ( italic_x start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT , italic_y start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT ) }
+(3)
+where
+x
+(
+i
+)
+∈
+ℝ
+n
+superscript
+𝑥
+𝑖
+superscript
+ℝ
+𝑛
+x^{(i)}\in\mathbb{R}^{n}
+italic_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_n end_POSTSUPERSCRIPT
+and
+y
+(
+i
+)
+∈
+𝒯
+superscript
+𝑦
+𝑖
+𝒯
+y^{(i)}\in\mathcal{T}
+italic_y start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ∈ caligraphic_T
+.
+Considering both technical indicators and historical data for price prediction necessitates the integration of diverse datasets. To achieve this, we combine technical indicators and historical data as inputs to our model. The feature vector at a given time
+t
+𝑡
+t
+italic_t
+can be expressed as follows:
+𝐱
+org
+(
+i
+)
+=
+[
+𝒞
+p
+(
+i
+)
+𝒱
+(
+i
+)
+RSI
+14
+(
+i
+)
+RSI
+30
+(
+i
+)
+RSI
+200
+(
+i
+)
+MOM
+10
+(
+i
+)
+MOM
+30
+(
+i
+)
+MACD
+(
+i
+)
+PROC
+9
+(
+i
+)
+EMA
+10
+(
+i
+)
+EMA
+30
+(
+i
+)
+EMA
+200
+(
+i
+)
+%
+K
+10
+(
+i
+)
+%
+K
+30
+(
+i
+)
+%
+K
+200
+(
+i
+)
+]
+,
+𝐱
+(
+i
+)
+∈
+ℝ
+n
+\mathbf{x_{\text{org}}}^{(i)}=\begin{bmatrix}\mathcal{C}_{p}^{(i)}\\
+\mathcal{V}^{(i)}\\
+\text{RSI}_{14}^{(i)}\\
+\text{RSI}_{30}^{(i)}\\
+\text{RSI}_{200}^{(i)}\\
+\text{MOM}_{10}^{(i)}\\
+\text{MOM}_{30}^{(i)}\\
+\text{MACD}^{(i)}\\
+\text{PROC}_{9}^{(i)}\\
+\text{EMA}_{10}^{(i)}\\
+\text{EMA}_{30}^{(i)}\\
+\text{EMA}_{200}^{(i)}\\
+\%K_{10}^{(i)}\\
+\%K_{30}^{(i)}\\
+\%K_{200}^{(i)}\\
+\end{bmatrix},\quad\mathbf{x}^{(i)}\in\mathbb{R}^{n}
+bold_x start_POSTSUBSCRIPT org end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = [ start_ARG start_ROW start_CELL caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL caligraphic_V start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL RSI start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL MOM start_POSTSUBSCRIPT 10 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL MACD start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL PROC start_POSTSUBSCRIPT 9 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL EMA start_POSTSUBSCRIPT 10 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL EMA start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL EMA start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 10 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ] , bold_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_n end_POSTSUPERSCRIPT
+(4)
+Let’s extend the generality of our model by stacking all feature vectors into a matrix
+𝐗
+org
+subscript
+𝐗
+org
+\mathbf{X_{\text{org}}}
+bold_X start_POSTSUBSCRIPT org end_POSTSUBSCRIPT
+. This matrix can now be expressed as follows:
+𝐗
+org
+=
+{bNiceMatrix}
+[
+f
+i
+r
+s
+t
+−
+r
+o
+w
+,
+f
+i
+r
+s
+t
+−
+c
+o
+l
+,
+l
+a
+s
+t
+−
+c
+o
+l
+,
+n
+u
+l
+l
+i
+f
+y
+−
+d
+o
+t
+s
+,
+c
+o
+d
+e
+−
+f
+o
+r
+−
+f
+i
+r
+s
+t
+−
+r
+o
+w
+=
+,
+c
+o
+d
+e
+−
+f
+o
+r
+−
+f
+i
+r
+s
+t
+−
+c
+o
+l
+=
+]
+&
+𝒞
+p
+𝒱
+⋯
+%
+K
+200
+x
+11
+x
+12
+⋯
+x
+1
+⁢
+n
+x
+21
+x
+22
+⋯
+x
+2
+⁢
+n
+x
+31
+x
+32
+⋯
+x
+3
+⁢
+n
+⋮
+⋮
+⋯
+⋮
+x
+m
+−
+11
+x
+m
+−
+12
+⋯
+x
+m
+−
+1
+⁢
+n
+x
+m
+⁢
+1
+x
+m
+⁢
+2
+⋯
+x
+m
+⁢
+n
+\mathbf{X_{\text{org}}}=\bNiceMatrix[first-row,first-col,last-col,nullify-dots%
+,code-for-first-row=\color[rgb]{1,0,1}\definecolor[named]{pgfstrokecolor}{rgb}%
+{1,0,1}\pgfsys@color@cmyk@stroke{0}{1}{0}{0}\pgfsys@color@cmyk@fill{0}{1}{0}{0%
+},code-for-first-col=\color[rgb]{0,0,1}\definecolor[named]{pgfstrokecolor}{rgb%
+}{0,0,1}]&\mathcal{C}_{p}\mathcal{V}\cdots\%K_{200}\\
+x_{11}x_{12}\cdots x_{1n}\\
+x_{21}x_{22}\cdots x_{2n}\\
+x_{31}x_{32}\cdots x_{3n}\\
+\vdots\vdots\cdots\vdots\\
+x_{m-11}x_{m-12}\cdots x_{m-1n}\\
+x_{m1}x_{m2}\cdots x_{mn}\\
+bold_X start_POSTSUBSCRIPT org end_POSTSUBSCRIPT = [ italic_f italic_i italic_r italic_s italic_t - italic_r italic_o italic_w , italic_f italic_i italic_r italic_s italic_t - italic_c italic_o italic_l , italic_l italic_a italic_s italic_t - italic_c italic_o italic_l , italic_n italic_u italic_l italic_l italic_i italic_f italic_y - italic_d italic_o italic_t italic_s , italic_c italic_o italic_d italic_e - italic_f italic_o italic_r - italic_f italic_i italic_r italic_s italic_t - italic_r italic_o italic_w = , italic_c italic_o italic_d italic_e - italic_f italic_o italic_r - italic_f italic_i italic_r italic_s italic_t - italic_c italic_o italic_l = ] & caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT caligraphic_V ⋯ % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 11 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 12 end_POSTSUBSCRIPT ⋯ italic_x start_POSTSUBSCRIPT 1 italic_n end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 21 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 22 end_POSTSUBSCRIPT ⋯ italic_x start_POSTSUBSCRIPT 2 italic_n end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 31 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT 32 end_POSTSUBSCRIPT ⋯ italic_x start_POSTSUBSCRIPT 3 italic_n end_POSTSUBSCRIPT ⋮ ⋮ ⋯ ⋮ italic_x start_POSTSUBSCRIPT italic_m - 11 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT italic_m - 12 end_POSTSUBSCRIPT ⋯ italic_x start_POSTSUBSCRIPT italic_m - 1 italic_n end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT italic_m 1 end_POSTSUBSCRIPT italic_x start_POSTSUBSCRIPT italic_m 2 end_POSTSUBSCRIPT ⋯ italic_x start_POSTSUBSCRIPT italic_m italic_n end_POSTSUBSCRIPT
+(5)
+Where:
+𝒞
+p
+subscript
+𝒞
+𝑝
+\displaystyle\mathcal{C}_{p}
+caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT
+=
+[
+𝒞
+p
+(
+1
+)
+𝒞
+p
+(
+2
+)
+⋮
+𝒞
+p
+(
+m
+)
+]
+,
+𝒱
+absent
+matrix
+superscript
+subscript
+𝒞
+𝑝
+1
+superscript
+subscript
+𝒞
+𝑝
+2
+⋮
+superscript
+subscript
+𝒞
+𝑝
+𝑚
+𝒱
+\displaystyle=\begin{bmatrix}\mathcal{C}_{p}^{(1)}\\
+\mathcal{C}_{p}^{(2)}\\
+\vdots\\
+\mathcal{C}_{p}^{(m)}\end{bmatrix},\mathcal{V}
+= [ start_ARG start_ROW start_CELL caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL ⋮ end_CELL end_ROW start_ROW start_CELL caligraphic_C start_POSTSUBSCRIPT italic_p end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ] , caligraphic_V
+=
+[
+𝒱
+(
+1
+)
+𝒱
+(
+2
+)
+⋮
+𝒱
+(
+m
+)
+]
+,
+…
+,
+%
+K
+200
+\displaystyle=\begin{bmatrix}\mathcal{V}^{(1)}\\
+\mathcal{V}^{(2)}\\
+\vdots\\
+\mathcal{V}^{(m)}\end{bmatrix},\ldots,\%K_{200}
+= [ start_ARG start_ROW start_CELL caligraphic_V start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL caligraphic_V start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL ⋮ end_CELL end_ROW start_ROW start_CELL caligraphic_V start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ] , … , % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT
+=
+[
+%
+K
+200
+(
+1
+)
+%
+K
+200
+(
+2
+)
+⋮
+%
+K
+200
+(
+m
+)
+]
+\displaystyle=\begin{bmatrix}\%K_{200}^{(1)}\\
+\%K_{200}^{(2)}\\
+\vdots\\
+\%K_{200}^{(m)}\end{bmatrix}
+= [ start_ARG start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL ⋮ end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ]
+The output matrix can be expressed as follows:
+Y
+=
+[
+y
+(
+1
+)
+y
+(
+2
+)
+⋮
+y
+(
+m
+)
+]
+𝑌
+matrix
+superscript
+𝑦
+1
+superscript
+𝑦
+2
+⋮
+superscript
+𝑦
+𝑚
+Y=\begin{bmatrix}y^{(1)}\\
+y^{(2)}\\
+\vdots\\
+y^{(m)}\end{bmatrix}
+italic_Y = [ start_ARG start_ROW start_CELL italic_y start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL italic_y start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL ⋮ end_CELL end_ROW start_ROW start_CELL italic_y start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ]
+where
+y
+(
+i
+)
+superscript
+𝑦
+𝑖
+y^{(i)}
+italic_y start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+belongs to the set
+𝒯
+𝒯
+\mathcal{T}
+caligraphic_T
+, and
+i
+𝑖
+i
+italic_i
+ranges from 1 to
+m
+𝑚
+m
+italic_m
+.
+For feature selection, We import the
+SelectKBest
+class from the
+feature_selection
+module in scikit-learn.
+SelectKBest
+is a feature selection method that selects the top
+k
+𝑘
+k
+italic_k
+features based on a scoring function, which in this case is
+chi2
+. The
+chi2
+function is a scoring function used to evaluate the importance of features based on the chi-squared (
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+) statistical test. This test is typically used for categorical data to measure the independence between each feature and the target variable.
+The
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+test statistic is calculated as follows:
+χ
+2
+=
+∑
+(
+O
+i
+−
+E
+i
+)
+2
+E
+i
+superscript
+𝜒
+2
+superscript
+subscript
+𝑂
+𝑖
+subscript
+𝐸
+𝑖
+2
+subscript
+𝐸
+𝑖
+\chi^{2}=\sum\frac{(O_{i}-E_{i})^{2}}{E_{i}}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT = ∑ divide start_ARG ( italic_O start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT - italic_E start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT end_ARG start_ARG italic_E start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT end_ARG
+where:
+•
+O
+i
+subscript
+𝑂
+𝑖
+O_{i}
+italic_O start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+is the observed frequency (actual count) of class
+i
+𝑖
+i
+italic_i
+.
+•
+E
+i
+subscript
+𝐸
+𝑖
+E_{i}
+italic_E start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+is the expected frequency (theoretical count) of class
+i
+𝑖
+i
+italic_i
+if there were no association between the feature and the target variable.
+We select the
+k
+=
+8
+𝑘
+8
+k=8
+italic_k = 8
+top features with high scores based on this feature selection method. The feature vector
+𝐱
+′
+(
+i
+)
+superscript
+superscript
+𝐱
+′
+𝑖
+\mathbf{x^{\prime}}^{(i)}
+bold_x start_POSTSUPERSCRIPT ′ end_POSTSUPERSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+will be replaced by
+𝐱
+(
+i
+)
+superscript
+𝐱
+𝑖
+\mathbf{x}^{(i)}
+bold_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+which can be expressed as follows:
+𝐱
+(
+i
+)
+=
+[
+RSI
+30
+(
+i
+)
+MACD
+(
+i
+)
+MOM
+30
+(
+i
+)
+%
+D
+30
+(
+i
+)
+%
+D
+2000
+(
+i
+)
+%
+K
+200
+(
+i
+)
+%
+K
+30
+(
+i
+)
+RSI
+14
+(
+i
+)
+]
+,
+𝐱
+(
+i
+)
+∈
+ℝ
+n
+\mathbf{x}^{(i)}=\begin{bmatrix}\text{RSI}_{30}^{(i)}\\
+\text{MACD}^{(i)}\\
+\text{MOM}_{30}^{(i)}\\
+\%D_{30}^{(i)}\\
+\%D_{2000}^{(i)}\\
+\%K_{200}^{(i)}\\
+\%K_{30}^{(i)}\\
+\text{RSI}_{14}^{(i)}\\
+\end{bmatrix},\quad\mathbf{x}^{(i)}\in\mathbb{R}^{n}
+bold_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT = [ start_ARG start_ROW start_CELL RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL MACD start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_D start_POSTSUBSCRIPT 2000 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW start_ROW start_CELL RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT end_CELL end_ROW end_ARG ] , bold_x start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT ∈ blackboard_R start_POSTSUPERSCRIPT italic_n end_POSTSUPERSCRIPT
+(6)
+The matrix
+𝐗
+org
+subscript
+𝐗
+org
+\mathbf{X}_{\text{org}}
+bold_X start_POSTSUBSCRIPT org end_POSTSUBSCRIPT
+will be replaced by
+𝐗
+𝐗
+\mathbf{X}
+bold_X
+as depicted in Figure
+4
+.
+𝐗
+=
+{bNiceMatrix}
+[
+f
+i
+r
+s
+t
+−
+r
+o
+w
+,
+f
+i
+r
+s
+t
+−
+c
+o
+l
+,
+n
+u
+l
+l
+i
+f
+y
+−
+d
+o
+t
+s
+,
+c
+o
+d
+e
+−
+f
+o
+r
+−
+f
+i
+r
+s
+t
+−
+r
+o
+w
+=
+,
+c
+o
+d
+e
+−
+f
+o
+r
+−
+f
+i
+r
+s
+t
+−
+c
+o
+l
+=
+]
+&
+RSI
+30
+MACD
+MOM
+30
+%
+D
+30
+%
+K
+200
+%
+K
+200
+%
+K
+30
+RSI
+14
+RSI
+30
+(
+1
+)
+MACD
+(
+1
+)
+MOM
+30
+(
+1
+)
+%
+D
+30
+(
+1
+)
+%
+K
+200
+(
+1
+)
+%
+K
+200
+(
+1
+)
+%
+K
+30
+(
+1
+)
+RSI
+14
+(
+1
+)
+RSI
+30
+(
+2
+)
+MACD
+(
+2
+)
+MOM
+30
+(
+2
+)
+%
+D
+30
+(
+2
+)
+%
+K
+200
+(
+2
+)
+%
+K
+200
+(
+2
+)
+%
+K
+30
+(
+2
+)
+RSI
+14
+(
+2
+)
+RSI
+30
+(
+3
+)
+MACD
+(
+3
+)
+MOM
+30
+(
+3
+)
+%
+D
+30
+(
+3
+)
+%
+K
+200
+(
+3
+)
+%
+K
+200
+(
+3
+)
+%
+K
+30
+(
+3
+)
+RSI
+14
+(
+3
+)
+⋮
+⋮
+⋮
+⋮
+⋮
+⋮
+⋮
+⋮
+RSI
+30
+(
+m
+)
+MACD
+(
+m
+)
+MOM
+30
+(
+m
+)
+%
+D
+30
+(
+m
+)
+%
+K
+200
+(
+m
+)
+%
+K
+200
+(
+m
+)
+%
+K
+30
+(
+m
+)
+RSI
+14
+(
+m
+)
+\mathbf{X}=\bNiceMatrix[first-row,first-col,nullify-dots,code-for-first-row=%
+\color[rgb]{1,0,1}\definecolor[named]{pgfstrokecolor}{rgb}{1,0,1}%
+\pgfsys@color@cmyk@stroke{0}{1}{0}{0}\pgfsys@color@cmyk@fill{0}{1}{0}{0},code-%
+for-first-col=\color[rgb]{0,0,1}\definecolor[named]{pgfstrokecolor}{rgb}{0,0,1%
+}]&\text{RSI}_{30}\text{MACD}\text{MOM}_{30}\%D_{30}\%K_{200}\%K_{200}\%K_{30}%
+\text{RSI}_{14}\\
+\text{RSI}_{30}^{(1)}\text{MACD}^{(1)}\text{MOM}_{30}^{(1)}\%D_{30}^{(1)}\%K_{%
+200}^{(1)}\%K_{200}^{(1)}\%K_{30}^{(1)}\text{RSI}_{14}^{(1)}\\
+\text{RSI}_{30}^{(2)}\text{MACD}^{(2)}\text{MOM}_{30}^{(2)}\%D_{30}^{(2)}\%K_{%
+200}^{(2)}\%K_{200}^{(2)}\%K_{30}^{(2)}\text{RSI}_{14}^{(2)}\\
+\text{RSI}_{30}^{(3)}\text{MACD}^{(3)}\text{MOM}_{30}^{(3)}\%D_{30}^{(3)}\%K_{%
+200}^{(3)}\%K_{200}^{(3)}\%K_{30}^{(3)}\text{RSI}_{14}^{(3)}\\
+\vdots\vdots\vdots\vdots\vdots\vdots\vdots\vdots\\
+\text{RSI}_{30}^{(m)}\text{MACD}^{(m)}\text{MOM}_{30}^{(m)}\%D_{30}^{(m)}\%K_{%
+200}^{(m)}\%K_{200}^{(m)}\%K_{30}^{(m)}\text{RSI}_{14}^{(m)}\\
+bold_X = [ italic_f italic_i italic_r italic_s italic_t - italic_r italic_o italic_w , italic_f italic_i italic_r italic_s italic_t - italic_c italic_o italic_l , italic_n italic_u italic_l italic_l italic_i italic_f italic_y - italic_d italic_o italic_t italic_s , italic_c italic_o italic_d italic_e - italic_f italic_o italic_r - italic_f italic_i italic_r italic_s italic_t - italic_r italic_o italic_w = , italic_c italic_o italic_d italic_e - italic_f italic_o italic_r - italic_f italic_i italic_r italic_s italic_t - italic_c italic_o italic_l = ] & RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT roman_MACD roman_MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT MACD start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 1 ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT MACD start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 2 ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT MACD start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 3 ) end_POSTSUPERSCRIPT ⋮ ⋮ ⋮ ⋮ ⋮ ⋮ ⋮ ⋮ RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT MACD start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT % italic_D start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 200 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT % italic_K start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT RSI start_POSTSUBSCRIPT 14 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_m ) end_POSTSUPERSCRIPT
+(7)
+Figure 4
+:
+Matrix
+𝐗
+𝐗
+\mathbf{X}
+bold_X
+showing various technical indicators (features) selected by the
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+statistical test. Each row represents different instances or observations, while each column corresponds to a specific technical indicator or feature. The notation
+RSI
+30
+(
+i
+)
+superscript
+subscript
+RSI
+30
+𝑖
+\text{RSI}_{30}^{(i)}
+RSI start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+,
+MACD
+(
+i
+)
+superscript
+MACD
+𝑖
+\text{MACD}^{(i)}
+MACD start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+,
+MOM
+30
+(
+i
+)
+superscript
+subscript
+MOM
+30
+𝑖
+\text{MOM}_{30}^{(i)}
+MOM start_POSTSUBSCRIPT 30 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_i ) end_POSTSUPERSCRIPT
+, etc., denote different instances/observations of the respective technical indicators.
+In this case study, the problem is to minimize the cost function for XGBoost, which is a regularized finite-sum minimization problem defined as:
+min
+Θ
+⁡
+J
+⁢
+(
+Θ
+)
+:=
+∑
+i
+=
+1
+m
+train
+L
+⁢
+(
+y
+i
+,
+y
+^
+i
+)
++
+∑
+k
+=
+1
+K
+ℛ
+⁢
+(
+f
+k
+)
+assign
+subscript
+Θ
+𝐽
+Θ
+superscript
+subscript
+𝑖
+1
+subscript
+𝑚
+train
+𝐿
+subscript
+𝑦
+𝑖
+subscript
+^
+𝑦
+𝑖
+superscript
+subscript
+𝑘
+1
+𝐾
+ℛ
+subscript
+𝑓
+𝑘
+\min_{\Theta}J(\Theta):=\sum_{i=1}^{m_{\text{train}}}L(y_{i},\hat{y}_{i})+\sum%
+_{k=1}^{K}\mathcal{R}(f_{k})
+roman_min start_POSTSUBSCRIPT roman_Θ end_POSTSUBSCRIPT italic_J ( roman_Θ ) := ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m start_POSTSUBSCRIPT train end_POSTSUBSCRIPT end_POSTSUPERSCRIPT italic_L ( italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) + ∑ start_POSTSUBSCRIPT italic_k = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_K end_POSTSUPERSCRIPT caligraphic_R ( italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT )
+(8)
+Where:
+•
+Θ
+Θ
+\Theta
+roman_Θ
+denotes the set of parameters to be optimized during the training process. The parameter set
+Θ
+Θ
+\Theta
+roman_Θ
+is defined as follows:
+Θ
+=
+(
+C
+γ
+η
+D
+max
+W
+min
+N
+α
+λ
+S
+)
+Θ
+matrix
+𝐶
+𝛾
+𝜂
+subscript
+𝐷
+max
+subscript
+𝑊
+min
+𝑁
+𝛼
+𝜆
+𝑆
+\Theta=\begin{pmatrix}C&\gamma&\eta&D_{\text{max}}&W_{\text{min}}&N&\alpha&%
+\lambda&S\end{pmatrix}
+roman_Θ = ( start_ARG start_ROW start_CELL italic_C end_CELL start_CELL italic_γ end_CELL start_CELL italic_η end_CELL start_CELL italic_D start_POSTSUBSCRIPT max end_POSTSUBSCRIPT end_CELL start_CELL italic_W start_POSTSUBSCRIPT min end_POSTSUBSCRIPT end_CELL start_CELL italic_N end_CELL start_CELL italic_α end_CELL start_CELL italic_λ end_CELL start_CELL italic_S end_CELL end_ROW end_ARG )
+•
+L
+⁢
+(
+y
+i
+,
+y
+^
+i
+)
+𝐿
+subscript
+𝑦
+𝑖
+subscript
+^
+𝑦
+𝑖
+L(y_{i},\hat{y}_{i})
+italic_L ( italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )
+is the loss function that measures the difference between the true label
+y
+i
+subscript
+𝑦
+𝑖
+y_{i}
+italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+and the predicted label
+y
+^
+i
+subscript
+^
+𝑦
+𝑖
+\hat{y}_{i}
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+for the
+i
+𝑖
+i
+italic_i
+-th instance. In the context of this case study, we employ the logistic loss function, which is expressed as follows:
+L
+⁢
+(
+y
+i
+,
+y
+^
+i
+)
+=
+−
+[
+y
+i
+⁢
+log
+⁡
+(
+y
+^
+i
+)
++
+(
+1
+−
+y
+i
+)
+⁢
+log
+⁡
+(
+1
+−
+y
+^
+i
+)
+]
+𝐿
+subscript
+𝑦
+𝑖
+subscript
+^
+𝑦
+𝑖
+delimited-[]
+subscript
+𝑦
+𝑖
+subscript
+^
+𝑦
+𝑖
+1
+subscript
+𝑦
+𝑖
+1
+subscript
+^
+𝑦
+𝑖
+L(y_{i},\hat{y}_{i})=-\left[y_{i}\log(\hat{y}_{i})+(1-y_{i})\log(1-\hat{y}_{i}%
+)\right]
+italic_L ( italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) = - [ italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT roman_log ( over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) + ( 1 - italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) roman_log ( 1 - over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) ]
+(9)
+Here,
+y
+i
+subscript
+𝑦
+𝑖
+y_{i}
+italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+is the true label (1 or 0), and
+y
+^
+i
+subscript
+^
+𝑦
+𝑖
+\hat{y}_{i}
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+is the predicted probability of class 1.
+•
+ℛ
+⁢
+(
+f
+k
+)
+ℛ
+subscript
+𝑓
+𝑘
+\mathcal{R}(f_{k})
+caligraphic_R ( italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT )
+represents the regularization term for each tree to control its complexity. It typically includes both
+L
+1
+subscript
+𝐿
+1
+L_{1}
+italic_L start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT
+and
+L
+2
+subscript
+𝐿
+2
+L_{2}
+italic_L start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT
+regularization. Assuming
+T
+𝑇
+T
+italic_T
+is the number of leaves in tree
+f
+k
+subscript
+𝑓
+𝑘
+f_{k}
+italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT
+and
+w
+j
+,
+k
+subscript
+𝑤
+𝑗
+𝑘
+w_{j,k}
+italic_w start_POSTSUBSCRIPT italic_j , italic_k end_POSTSUBSCRIPT
+is the weight for leaf
+j
+𝑗
+j
+italic_j
+in tree
+f
+k
+subscript
+𝑓
+𝑘
+f_{k}
+italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT
+, the regularization term for tree
+f
+k
+subscript
+𝑓
+𝑘
+f_{k}
+italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT
+is:
+ℛ
+⁢
+(
+f
+k
+)
+=
+γ
+⁢
+T
++
+1
+2
+⁢
+λ
+⁢
+∑
+j
+=
+1
+T
+w
+j
+,
+k
+2
++
+α
+⁢
+∑
+j
+=
+1
+T
+|
+w
+j
+,
+k
+|
+ℛ
+subscript
+𝑓
+𝑘
+𝛾
+𝑇
+1
+2
+𝜆
+superscript
+subscript
+𝑗
+1
+𝑇
+superscript
+subscript
+𝑤
+𝑗
+𝑘
+2
+𝛼
+superscript
+subscript
+𝑗
+1
+𝑇
+subscript
+𝑤
+𝑗
+𝑘
+\mathcal{R}(f_{k})=\gamma T+\frac{1}{2}\lambda\sum_{j=1}^{T}w_{j,k}^{2}+\alpha%
+\sum_{j=1}^{T}|w_{j,k}|
+caligraphic_R ( italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT ) = italic_γ italic_T + divide start_ARG 1 end_ARG start_ARG 2 end_ARG italic_λ ∑ start_POSTSUBSCRIPT italic_j = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_T end_POSTSUPERSCRIPT italic_w start_POSTSUBSCRIPT italic_j , italic_k end_POSTSUBSCRIPT start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT + italic_α ∑ start_POSTSUBSCRIPT italic_j = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_T end_POSTSUPERSCRIPT | italic_w start_POSTSUBSCRIPT italic_j , italic_k end_POSTSUBSCRIPT |
+(10)
+The regularization terms (
+ℛ
+⁢
+(
+f
+k
+)
+ℛ
+subscript
+𝑓
+𝑘
+\mathcal{R}(f_{k})
+caligraphic_R ( italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT )
+) help control the complexity of individual trees in the ensemble, preventing overfitting.
+During training, XGBoost aims to find the set of parameters (
+Θ
+Θ
+\Theta
+roman_Θ
+) that minimizes the overall cost function. The optimization is performed using gradient boosting (Algorithm
+1
+), which involves iteratively adding weak learners to the ensemble to reduce the residual errors.
+Algorithm 1
+Algorithm for XGBoost (Gradient Boosting for classification).
+1:
+// Initialize model with constant value
+2:
+Initialize model with constant value
+y
+^
+i
+(
+0
+)
+superscript
+subscript
+^
+𝑦
+𝑖
+0
+\hat{y}_{i}^{(0)}
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( 0 ) end_POSTSUPERSCRIPT
+.
+3:
+for
+k
+=
+1
+𝑘
+1
+k=1
+italic_k = 1
+to
+K
+𝐾
+K
+italic_K
+do
+4:
+// Compute the gradient for the logistic loss function
+5:
+Compute the gradient
+g
+i
+(
+k
+)
+=
+∂
+L
+⁢
+(
+y
+i
+,
+y
+^
+i
+(
+k
+−
+1
+)
+)
+∂
+y
+^
+i
+(
+k
+−
+1
+)
+superscript
+subscript
+𝑔
+𝑖
+𝑘
+𝐿
+subscript
+𝑦
+𝑖
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+1
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+1
+g_{i}^{(k)}=\frac{\partial L(y_{i},\hat{y}_{i}^{(k-1)})}{\partial\hat{y}_{i}^{%
+(k-1)}}
+italic_g start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT = divide start_ARG ∂ italic_L ( italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k - 1 ) end_POSTSUPERSCRIPT ) end_ARG start_ARG ∂ over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k - 1 ) end_POSTSUPERSCRIPT end_ARG
+.
+6:
+// Compute the Hessian for the logistic loss function
+7:
+Compute the Hessian
+h
+i
+(
+k
+)
+=
+∂
+2
+L
+⁢
+(
+y
+i
+,
+y
+^
+i
+(
+k
+−
+1
+)
+)
+∂
+y
+^
+i
+(
+k
+−
+1
+)
+⁢
+2
+superscript
+subscript
+ℎ
+𝑖
+𝑘
+superscript
+2
+𝐿
+subscript
+𝑦
+𝑖
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+1
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+1
+2
+h_{i}^{(k)}=\frac{\partial^{2}L(y_{i},\hat{y}_{i}^{(k-1)})}{\partial\hat{y}_{i%
+}^{(k-1)2}}
+italic_h start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT = divide start_ARG ∂ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT italic_L ( italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT , over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k - 1 ) end_POSTSUPERSCRIPT ) end_ARG start_ARG ∂ over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k - 1 ) 2 end_POSTSUPERSCRIPT end_ARG
+.
+8:
+// Fit a regression tree to the gradients and Hessians
+9:
+Fit a regression tree
+f
+k
+subscript
+𝑓
+𝑘
+f_{k}
+italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT
+to the gradients
+g
+i
+(
+k
+)
+superscript
+subscript
+𝑔
+𝑖
+𝑘
+g_{i}^{(k)}
+italic_g start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT
+and Hessians
+h
+i
+(
+k
+)
+superscript
+subscript
+ℎ
+𝑖
+𝑘
+h_{i}^{(k)}
+italic_h start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT
+.
+10:
+// Compute the weight for each leaf in the tree
+11:
+Compute the weight for each leaf
+w
+j
+,
+k
+subscript
+𝑤
+𝑗
+𝑘
+w_{j,k}
+italic_w start_POSTSUBSCRIPT italic_j , italic_k end_POSTSUBSCRIPT
+using:
+w
+j
+,
+k
+=
+−
+∑
+i
+∈
+I
+j
+g
+i
+(
+k
+)
+∑
+i
+∈
+I
+j
+h
+i
+(
+k
+)
++
+λ
+subscript
+𝑤
+𝑗
+𝑘
+subscript
+𝑖
+subscript
+𝐼
+𝑗
+superscript
+subscript
+𝑔
+𝑖
+𝑘
+subscript
+𝑖
+subscript
+𝐼
+𝑗
+superscript
+subscript
+ℎ
+𝑖
+𝑘
+𝜆
+w_{j,k}=-\frac{\sum_{i\in I_{j}}g_{i}^{(k)}}{\sum_{i\in I_{j}}h_{i}^{(k)}+\lambda}
+italic_w start_POSTSUBSCRIPT italic_j , italic_k end_POSTSUBSCRIPT = - divide start_ARG ∑ start_POSTSUBSCRIPT italic_i ∈ italic_I start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_POSTSUBSCRIPT italic_g start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT end_ARG start_ARG ∑ start_POSTSUBSCRIPT italic_i ∈ italic_I start_POSTSUBSCRIPT italic_j end_POSTSUBSCRIPT end_POSTSUBSCRIPT italic_h start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT + italic_λ end_ARG
+12:
+// Add the regularization term to control tree complexity
+13:
+Add the regularization term
+ℛ
+⁢
+(
+f
+k
+)
+ℛ
+subscript
+𝑓
+𝑘
+\mathcal{R}(f_{k})
+caligraphic_R ( italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT )
+to control tree complexity.
+14:
+// Update the prediction with the new tree
+15:
+Update the prediction:
+y
+^
+i
+(
+k
+)
+=
+y
+^
+i
+(
+k
+−
+1
+)
++
+η
+⁢
+f
+k
+⁢
+(
+x
+i
+)
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑘
+1
+𝜂
+subscript
+𝑓
+𝑘
+subscript
+𝑥
+𝑖
+\hat{y}_{i}^{(k)}=\hat{y}_{i}^{(k-1)}+\eta f_{k}(x_{i})
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k ) end_POSTSUPERSCRIPT = over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_k - 1 ) end_POSTSUPERSCRIPT + italic_η italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )
+16:
+end
+for
+17:
+// Output the final model
+18:
+Output the final model:
+y
+^
+i
+=
+∑
+k
+=
+1
+K
+η
+⁢
+f
+k
+⁢
+(
+x
+i
+)
+subscript
+^
+𝑦
+𝑖
+superscript
+subscript
+𝑘
+1
+𝐾
+𝜂
+subscript
+𝑓
+𝑘
+subscript
+𝑥
+𝑖
+\hat{y}_{i}=\sum_{k=1}^{K}\eta f_{k}(x_{i})
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT = ∑ start_POSTSUBSCRIPT italic_k = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_K end_POSTSUPERSCRIPT italic_η italic_f start_POSTSUBSCRIPT italic_k end_POSTSUBSCRIPT ( italic_x start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT )
+.
+TABLE II
+:
+Parameter grid for GridSearchCV.
+Parameter
+Values
+N
+𝑁
+N
+italic_N
+300, 400
+η
+𝜂
+\eta
+italic_η
+0.01, 0.1, 0.2
+D
+max
+subscript
+𝐷
+D_{\max}
+italic_D start_POSTSUBSCRIPT roman_max end_POSTSUBSCRIPT
+3, 4
+W
+min
+subscript
+𝑊
+min
+W_{\text{min}}
+italic_W start_POSTSUBSCRIPT min end_POSTSUBSCRIPT
+1, 3
+S
+𝑆
+S
+italic_S
+0.8, 1.0
+C
+𝐶
+C
+italic_C
+0.8, 1.0
+γ
+𝛾
+\gamma
+italic_γ
+0, 0.1
+α
+𝛼
+\alpha
+italic_α
+0.5, 1
+λ
+𝜆
+\lambda
+italic_λ
+0.5, 1
+Table
+II
+presents a parameter grid used in GridSearchCV, a technique for hyperparameter tuning in machine learning models. Hyperparameters are predefined settings that control the learning process of algorithms. The table lists various hyperparameters commonly used in the XGBoost regressor model, a popular gradient boosting framework
+[
+24
+]
+. Each hyperparameter is accompanied by its corresponding values, explored during the grid search process. For instance,
+N
+𝑁
+N
+italic_N
+represents the number of estimators (trees) in the XGBoost model, with values of 300 and 400 being considered. Similarly,
+η
+𝜂
+\eta
+italic_η
+denotes the learning rate, with potential values of 0.01, 0.1, and 0.2.
+Other hyperparameters include
+D
+max
+subscript
+𝐷
+max
+D_{\text{max}}
+italic_D start_POSTSUBSCRIPT max end_POSTSUBSCRIPT
+for maximum depth of trees,
+W
+min
+subscript
+𝑊
+min
+W_{\text{min}}
+italic_W start_POSTSUBSCRIPT min end_POSTSUBSCRIPT
+for minimum child weight,
+S
+𝑆
+S
+italic_S
+for subsampling ratio,
+C
+𝐶
+C
+italic_C
+for column subsampling ratio,
+γ
+𝛾
+\gamma
+italic_γ
+for minimum loss reduction required to make further splits,
+α
+𝛼
+\alpha
+italic_α
+for L1 regularization term on weights, and
+λ
+𝜆
+\lambda
+italic_λ
+for L2 regularization term on weights.
+This parameter grid serves as a roadmap for systematically exploring various combinations of hyperparameters to identify the optimal configuration for the XGBoost model, thereby enhancing its predictive performance. The best combination of hyperparameters for the XGBoost model was selected based on the smallest RMSE, resulting in enhanced predictive performance. The chosen parameters are as follows:
+Θ
+=
+(
+C
+γ
+η
+D
+max
+W
+min
+N
+α
+λ
+S
+1.0
+0.1
+0.1
+4
+3
+400
+0.5
+1
+0.8
+)
+Θ
+matrix
+𝐶
+𝛾
+𝜂
+subscript
+𝐷
+max
+subscript
+𝑊
+min
+𝑁
+𝛼
+𝜆
+𝑆
+1.0
+0.1
+0.1
+4
+3
+400
+0.5
+1
+0.8
+\Theta=\begin{pmatrix}C&\gamma&\eta&D_{\text{max}}&W_{\text{min}}&N&\alpha&%
+\lambda&S\\
+1.0&0.1&0.1&4&3&400&0.5&1&0.8\\
+\end{pmatrix}
+roman_Θ = ( start_ARG start_ROW start_CELL italic_C end_CELL start_CELL italic_γ end_CELL start_CELL italic_η end_CELL start_CELL italic_D start_POSTSUBSCRIPT max end_POSTSUBSCRIPT end_CELL start_CELL italic_W start_POSTSUBSCRIPT min end_POSTSUBSCRIPT end_CELL start_CELL italic_N end_CELL start_CELL italic_α end_CELL start_CELL italic_λ end_CELL start_CELL italic_S end_CELL end_ROW start_ROW start_CELL 1.0 end_CELL start_CELL 0.1 end_CELL start_CELL 0.1 end_CELL start_CELL 4 end_CELL start_CELL 3 end_CELL start_CELL 400 end_CELL start_CELL 0.5 end_CELL start_CELL 1 end_CELL start_CELL 0.8 end_CELL end_ROW end_ARG )
+Finally, the RMSE achieved with this parameter combination is the smallest observed during the hyperparameter tuning process.
+V
+Results & Interpretation
+This section presents a comprehensive analysis of the results obtained from implementing various technical indicators, including Bollinger Bands, Average True Range, Commodity Channel Index, Williams %R, and Chaikin Money Flow, on the Bitcoin price dataset. The performance and effectiveness of these indicators are evaluated through simulations, focusing on their ability to predict market trends and identify trading signals.
+V-A
+Simulation Setup
+We conducted simulations on historical Bitcoin price data using a rolling window approach (15 minutes). Technical indicators (e.g., Bollinger Bands, Average True Range, Commodity Channel Index, Williams %R, Chaikin Money Flow) were fed into the XGBoost Classifier, parameterized by the optimized vector
+Θ
+Θ
+\Theta
+roman_Θ
+(described in Section
+IV
+), to generate buy/sell signals. Performance was evaluated using several metrics, such as accuracy, precision, and the ROC curve. Simulations were conducted on a Google Colab notebook using a T4 GPU.
+V-B
+Results & Analysis
+We present the experimental results that assess the performance of the proposed model, alongside a comparative analysis with the Logistic Regression model. The best parameters for Logistic Regression are shown in Appendix
+B
+.
+TABLE III
+:
+Comparison of Performance Metrics for XGBoost and Logistic Regression Models.
+Metric
+XGBoost
+Logistic Regression
+Accuracy
+0.9240
+0.9101
+Precision
+0.8917
+0.8802
+Recall
+0.9490
+0.9298
+F1 Score
+0.9195
+0.9043
+ROC AUC
+0.9817
+0.9760
+Table
+III
+compares the key performance metrics of the XGBoost and Logistic Regression models. The metrics include Accuracy, Precision, Recall, F1 Score, and ROC AUC. Both models perform well, with XGBoost showing slightly better values across most metrics. XGBoost has a higher accuracy (0.9240 vs. 0.9101), recall (0.9490 vs. 0.9298), and ROC AUC (0.9817 vs. 0.9760), indicating better classification and discrimination capability. However, the Logistic Regression model still performs competitively, offering slightly lower but reasonable values for all metrics.
+TABLE IV
+:
+Comparison of Confusion Matrices for XGBoost and Logistic Regression Models.
+XGBoost
+Logistic Regression
+Actual
+Predicted 0
+Predicted 1
+Predicted 0
+Predicted 1
+0 (Sell)
+3408
+366
+3372
+402
+1 (Buy)
+162
+3015
+223
+2954
+Table
+IV
+provides a comparison of the confusion matrices for the XGBoost and Logistic Regression models in predicting Bitcoin prices. The XGBoost model correctly identifies 3408 Sell operations and 3015 Buy operations, with 366 Sell operations misclassified as Buys and 162 Buy operations misclassified as Sells. In comparison, the Logistic Regression model correctly identifies 3372 Sell operations and 2954 Buy operations, with slightly higher misclassifications, as 402 Sell operations are misclassified as Buys and 223 Buy operations are misclassified as Sells.
+Overall, the XGBoost model exhibits better performance in terms of correct classification, particularly with fewer misclassifications compared to Logistic Regression.
+Figure 5
+:
+Receiver Operating Characteristic (ROC) curve comparison for XGBoost and Logistic Regression.
+Figure
+5
+illustrates the Receiver Operating Characteristic (ROC) curves for both the XGBoost and Logistic Regression models. The ROC curve visually represents the trade-off between the true positive rate (recall/sensitivity) and the false positive rate (1-specificity) at various threshold levels. Notably, the XGBoost curve is positioned closer to the ideal top-left corner compared to Logistic Regression, indicating superior discriminative ability between the positive and negative classes. The area under the curve (AUC) for XGBoost is higher, signifying better overall performance, with a more effective balance of minimizing false positives while maximizing true positives.
+Figure 6
+:
+Importance scores of various technical indicators and historical data determined by the
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+statistical test.
+Figure
+6
+shows the importance scores of various technical indicators and historical data determined by the
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+statistical test. The figure illustrates the relative significance of these features in predicting Bitcoin prices. The top 8 features, based on their importance scores, are RSI30, MACD, MOM30, %D30, %D200, %K200, %K30, and RSI14, highlighting their critical role in the feature selection process for the predictive model.
+Figure 7
+:
+Log loss over iterations for training and test sets. The figure demonstrates the behavior of the log loss function for the XGBoost model as the number of iterations increases.
+Figure
+7
+illustrates the log loss function for both the training and test sets over the number of iterations. The log loss, a standard metric for evaluating the performance of classification models, measures the uncertainty of predictions. As shown in the figure, the log loss decreases steadily with the increase in the number of iterations, indicating that the model is learning effectively.
+Specifically, the training and test log loss values decrease at a similar rate, and they remain close to each other throughout the iterations. This close alignment between the training and test log loss curves is a positive indicator, suggesting that the model is generalizing well to unseen data and is not overfitting.
+The decreasing trend of the log loss function for both sets confirms that the model’s predictions are becoming more accurate with more iterations. Additionally, the absence of a significant gap between the training and test log loss values suggests that the regularization techniques employed effectively prevent overfitting. This balance is crucial for ensuring the model’s robustness and reliability in practical applications.
+Figure 8
+:
+Error over iterations for training and test sets. The figure shows the behavior of the error function for the XGBoost model as the number of iterations increases.
+Figure
+8
+illustrates the error function for both the training and test sets over the number of iterations for the XGBoost model. The error function measures the proportion of incorrect predictions made by the model. Mathematically, the error rate at iteration
+t
+𝑡
+t
+italic_t
+can be expressed as:
+Error
+t
+=
+1
+m
+⁢
+∑
+i
+=
+1
+m
+𝟏
+⁢
+(
+y
+^
+i
+(
+t
+)
+≠
+y
+i
+)
+,
+subscript
+Error
+𝑡
+1
+𝑚
+superscript
+subscript
+𝑖
+1
+𝑚
+1
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑡
+subscript
+𝑦
+𝑖
+\text{Error}_{t}=\frac{1}{m}\sum_{i=1}^{m}\mathbf{1}(\hat{y}_{i}^{(t)}\neq y_{%
+i}),
+Error start_POSTSUBSCRIPT italic_t end_POSTSUBSCRIPT = divide start_ARG 1 end_ARG start_ARG italic_m end_ARG ∑ start_POSTSUBSCRIPT italic_i = 1 end_POSTSUBSCRIPT start_POSTSUPERSCRIPT italic_m end_POSTSUPERSCRIPT bold_1 ( over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_t ) end_POSTSUPERSCRIPT ≠ italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT ) ,
+where
+y
+^
+i
+(
+t
+)
+superscript
+subscript
+^
+𝑦
+𝑖
+𝑡
+\hat{y}_{i}^{(t)}
+over^ start_ARG italic_y end_ARG start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT start_POSTSUPERSCRIPT ( italic_t ) end_POSTSUPERSCRIPT
+is the predicted label for the
+i
+𝑖
+i
+italic_i
+-th sample at iteration
+t
+𝑡
+t
+italic_t
+,
+y
+i
+subscript
+𝑦
+𝑖
+y_{i}
+italic_y start_POSTSUBSCRIPT italic_i end_POSTSUBSCRIPT
+is the true label, and
+𝟏
+⁢
+(
+⋅
+)
+1
+⋅
+\mathbf{1}(\cdot)
+bold_1 ( ⋅ )
+is the indicator function that equals 1 when its argument is true and 0 otherwise.
+As depicted in the figure, the error decreases consistently as the number of iterations increases, indicating that the model’s performance improves with more iterations. The training and test error values decline at a similar pace, and they remain close throughout the iterations.
+The convergence of the training and test error curves suggests that the model effectively learns from the training data and generalizes well to the test data. The small gap between the training and test error values indicates that the model is not overfitting, which is corroborated by regularization techniques.
+The error function’s downward trend signifies the model’s increasing accuracy over time, with fewer misclassifications occurring as the number of iterations rises. This close alignment between the training and test error curves further supports the robustness and reliability of the XGBoost model in making accurate predictions.
+VI
+Discussion & Comparison
+TABLE V
+:
+Comparison of current work with existing studies based on various factors including the focus of the paper, the methodologies employed, different metrics utilized, and the resultant outcomes.
+Study
+Focus
+Methods
+Metrics
+Results
+Shynkevich et al. (2017)
+[
+8
+]
+Stock prices
+Technical indicators, ML algorithms
+Accuracy, Sharpe ratio
+Optimal window
+≈
+\approx
+≈
+horizon
+Liu et al. (2021)
+[
+2
+]
+Bitcoin prices
+SDAE, BPNN, SVR
+MAPE, RMSE, DA
+SDAE: MAPE 4.5%, RMSE 0.012
+Jaquart et al. (2022)
+[
+11
+]
+Crypto trading
+LSTM, GRU
+Accuracy, Sharpe ratio
+Accuracy: 57.5%-59.5%, SR: 3.23 (LSTM)
+Saad et al. (2019)
+[
+13
+]
+Crypto dynamics
+Economic theories, ML methods
+Accuracy
+Up to 99% accuracy
+Akyildirim et al. (2021)
+[
+15
+]
+Crypto prices
+SVM, Logistic Regression, ANN, RF
+Accuracy
+Accuracy: 55%-65%
+Roy et al. (2023)
+[
+17
+]
+Bitcoin prices
+LSTM
+MAE, RMSE,
+R
+2
+superscript
+𝑅
+2
+R^{2}
+italic_R start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+MAE: 253.30, RMSE: 409.41,
+R
+2
+superscript
+𝑅
+2
+R^{2}
+italic_R start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+: 0.9987
+Hafid et al. (2023)
+[
+3
+]
+Bitcoin trends
+RF, technical indicators
+Accuracy
+86% accuracy
+Passalis et al. (2018)
+[
+10
+]
+Stock prices
+Temporal BoF model
+Precision, Recall, F1 score, Cohen’s
+κ
+𝜅
+\kappa
+italic_κ
+Precision: 46.01, Recall: 56.21, F1 score: 45.46,
+κ
+𝜅
+\kappa
+italic_κ
+: 0.2222
+Lin et al. (2020)
+[
+9
+]
+Stock prices
+RNN
+RMSE, MAE, Accuracy
+RMSE: 12.933, MAE: 10.44, Accuracy: 59.4%
+Current Work
+Bitcoin trading
+XGBoost, chi-squared test, technical indicators
+Accuracy, feature importance
+Key features: RSI30, MACD, MOM30, Accuracy: 92.4%
+Table
+V
+compares the current work with several significant existing stock and cryptocurrency price prediction studies. This table outlines each study’s focus, methods, metrics, and key results, allowing for a clear comparison of different approaches and their outcomes. Each study is categorized based on its primary focus, ranging from stock prices to cryptocurrency dynamics, and employs various methods such as machine learning algorithms, economic theories, and technical indicators. Key performance metrics include Acc., SR, MAPE, RMSE, MAE, and
+R
+2
+superscript
+𝑅
+2
+R^{2}
+italic_R start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+, providing a thorough evaluation framework across different prediction models. The results highlight the effectiveness of each approach in forecasting price movements and offer insights into the progress made in predictive modeling within the financial and cryptocurrency sectors.
+The analysis highlights the strengths and limitations of each technical indicator. For instance, while Bollinger Bands effectively captured price reversals, it occasionally generated false signals in highly volatile markets. Similarly, the ATR helped adjust trading strategies based on market volatility but required careful tuning of the parameter
+τ
+𝜏
+\tau
+italic_τ
+. The CCI and Williams %R indicators were sensitive to sudden price changes, making them suitable for short-term trading strategies. CMF provided a unique perspective on market sentiment by incorporating volume data, enhancing the overall analysis.
+VII
+Conclusion
+With an emphasis on Bitcoin cryptocurrency, we have introduced a classification-based machine learning model in this work to forecast the direction of cryptocurrency markets. By applying crucial technical indicators like the Moving Average Convergence Divergence and Relative Strength Index, we were able to train a machine learning model to produce remarkably accurate buy and sell recommendations.
+Our thorough empirical investigation shows that the suggested methodology works well. The robustness and dependability of the model are demonstrated by the classification report’s accuracy of 92.40%, precision of 89.17%, recall of 94.90%, F1 score of 91.95%, and ROC AUC of 98.17%. The confusion matrix and the ROC curve further support the model’s remarkable ability to differentiate between positive and negative classes.
+The importance of technical indicators in predicting market trends and identifying trading signals is highlighted by analyzing several of them, such as Bollinger Bands, Average True Range, Commodity Channel Index, Williams %R, and Chaikin Money Flow. The relevance of indicators like RSI30, MACD, MOM30, %D30, %D200, %K200, %K30, RSI14, RSI200, and CCI20 in the feature selection process is highlighted by the critical scores of the
+χ
+2
+superscript
+𝜒
+2
+\chi^{2}
+italic_χ start_POSTSUPERSCRIPT 2 end_POSTSUPERSCRIPT
+statistical test.
+Furthermore, with a steady decline in both log loss and error rates, our examination of the log loss and error functions over iterations shows that the XGBoost model learns from the training data efficiently and generalizes well to new data. The slightest difference between test and training metrics indicates the model’s resilience and capacity to prevent overfitting.
+Our machine learning model shows significant potential in aiding cryptocurrency traders and investors in making informed decisions in the volatile and dynamic market. If more market indicators are added and various machine learning algorithms are tested, future studies should investigate how to improve prediction accuracy and robustness even more.
+Appendix A
+Time Series Data Splitting for Training and Testing
+This appendix presents a mathematical expression for splitting our time series dataset into training and testing sets. The objective is to allocate a specified percentage for the testing set while maintaining the order of observations.
+Let
+p
+𝑝
+p
+italic_p
+be the desired percentage of the dataset for the testing set.
+A-A
+Training Set (First Part)
+The training set includes the initial part of the time series, starting from the first observation and continuing up to a specified index
+t
+train_end
+subscript
+𝑡
+train_end
+t_{\text{train\_end}}
+italic_t start_POSTSUBSCRIPT train_end end_POSTSUBSCRIPT
+. The training set indices are given by:
+T
+train
+=
+{
+1
+,
+2
+,
+3
+,
+…
+,
+t
+train_end
+}
+subscript
+𝑇
+train
+1
+2
+3
+…
+subscript
+𝑡
+train_end
+T_{\text{train}}=\{1,2,3,\ldots,t_{\text{train\_end}}\}
+italic_T start_POSTSUBSCRIPT train end_POSTSUBSCRIPT = { 1 , 2 , 3 , … , italic_t start_POSTSUBSCRIPT train_end end_POSTSUBSCRIPT }
+A-B
+Testing Set (Remaining Part with Percentage Adjustment)
+The testing set includes the remaining part of the time series, starting from the index
+t
+test_start
++
+1
+subscript
+𝑡
+test_start
+1
+t_{\text{test\_start}}+1
+italic_t start_POSTSUBSCRIPT test_start end_POSTSUBSCRIPT + 1
+and continuing up to the last observation. The testing set indices are given by:
+T
+test
+=
+{
+t
+test_start
++
+1
+,
+t
+test_start
++
+2
+,
+…
+,
+m
+}
+subscript
+𝑇
+test
+subscript
+𝑡
+test_start
+1
+subscript
+𝑡
+test_start
+2
+…
+𝑚
+T_{\text{test}}=\{t_{\text{test\_start}}+1,t_{\text{test\_start}}+2,\ldots,m\}
+italic_T start_POSTSUBSCRIPT test end_POSTSUBSCRIPT = { italic_t start_POSTSUBSCRIPT test_start end_POSTSUBSCRIPT + 1 , italic_t start_POSTSUBSCRIPT test_start end_POSTSUBSCRIPT + 2 , … , italic_m }
+where
+t
+test_start
+=
+⌊
+(
+1
+−
+p
+)
+⋅
+m
+⌋
+subscript
+𝑡
+test_start
+⋅
+1
+𝑝
+𝑚
+t_{\text{test\_start}}=\lfloor(1-p)\cdot m\rfloor
+italic_t start_POSTSUBSCRIPT test_start end_POSTSUBSCRIPT = ⌊ ( 1 - italic_p ) ⋅ italic_m ⌋
+.
+This approach ensures that the testing set is adjusted to the desired percentage of the dataset. The parameter
+p
+𝑝
+p
+italic_p
+can be adjusted based on specific requirements.
+Appendix B
+Hyperparameter Tuning for Logistic Regression
+We employed GridSearchCV for hyperparameter optimization of our logistic regression model. The parameter space explored is presented in Table
+VI
+.
+Hyperparameter
+Values
+Penalty
+ℓ
+1
+subscript
+ℓ
+1
+\ell_{1}
+roman_ℓ start_POSTSUBSCRIPT 1 end_POSTSUBSCRIPT
+,
+ℓ
+2
+subscript
+ℓ
+2
+\ell_{2}
+roman_ℓ start_POSTSUBSCRIPT 2 end_POSTSUBSCRIPT
+, elasticnet, none
+C
+0.01, 0.1, 1, 10, 100
+Solver
+liblinear, saga
+max_iter
+100, 200, 300
+TABLE VI
+:
+Hyperparameter grid for logistic regression
+This systematic search aims to identify the optimal configuration, enhancing the model’s predictive performance and generalization capabilities (i.e., preventing overfitting). After hyperparameter tuning, the best parameters found for the logistic regression model are
+params_log_reg = {‘C’: 0.1, ‘max_iter’: 100, ‘penalty’: ‘l1’, ‘solver’: ‘saga’}
+.
+References
+[1]
+Y.-L. Hsu, Y.-C. Tsai, and C.-T. Li, “Fingat: Financial graph attention networks for recommending top-
+k
+𝑘
+k
+italic_k
+k profitable stocks,”
+IEEE Transactions on Knowledge and Data Engineering
+, vol. 35, no. 1, pp. 469–481, 2021.
+[2]
+M. Liu, G. Li, J. Li, X. Zhu, and Y. Yao, “Forecasting the price of bitcoin using deep learning,”
+Finance research letters
+, vol. 40, p. 101755, 2021.
+[3]
+A. Hafid, A. S. Hafid, and D. Makrakis, “Bitcoin price prediction using machine learning and technical indicators,” in
+International Symposium on Distributed Computing and Artificial Intelligence
+.   Springer, 2023, pp. 275–284.
+[4]
+S. Nakamoto, “Bitcoin whitepaper,”
+URL: https://bitcoin.org/bitcoin.pdf
+, 2008.
+[5]
+A. Hafid, A. S. Hafid, and M. Samih, “Scaling blockchains: A comprehensive survey,”
+IEEE access
+, vol. 8, pp. 125 244–125 262, 2020.
+[6]
+C. Zhao, P. Hu, X. Liu, X. Lan, and H. Zhang, “Stock market analysis using time series relational models for stock price prediction,”
+Mathematics
+, vol. 11, no. 5, p. 1130, 2023.
+[7]
+V. Buterin
+et al.
+, “A next-generation smart contract and decentralized application platform,”
+white paper
+, vol. 3, no. 37, pp. 2–1, 2014.
+[8]
+Y. Shynkevich, T. M. McGinnity, S. A. Coleman, A. Belatreche, and Y. Li, “Forecasting price movements using technical indicators: Investigating the impact of varying input window length,”
+Neurocomputing
+, vol. 264, pp. 71–88, 2017.
+[9]
+Y.-F. Lin, T.-M. Huang, W.-H. Chung, and Y.-L. Ueng, “Forecasting fluctuations in the financial index using a recurrent neural network based on price features,”
+IEEE Transactions on Emerging Topics in Computational Intelligence
+, vol. 5, no. 5, pp. 780–791, 2020.
+[10]
+N. Passalis, A. Tefas, J. Kanniainen, M. Gabbouj, and A. Iosifidis, “Temporal bag-of-features learning for predicting mid price movements using high frequency limit order book data,”
+IEEE Transactions on Emerging Topics in Computational Intelligence
+, vol. 4, no. 6, pp. 774–785, 2018.
+[11]
+P. Jaquart, S. Köpke, and C. Weinhardt, “Machine learning for cryptocurrency market prediction and trading,”
+The Journal of Finance and Data Science
+, vol. 8, pp. 331–352, 2022.
+[12]
+“CoinGecko Methodology,”
+https://www.coingecko.com/en/methodology
+, accessed: February 7, 2024.
+[13]
+M. Saad, J. Choi, D. Nyang, J. Kim, and A. Mohaisen, “Toward characterizing blockchain-based cryptocurrencies for highly accurate predictions,”
+IEEE Systems Journal
+, vol. 14, no. 1, pp. 321–332, 2019.
+[14]
+G. Wood
+et al.
+, “Ethereum: A secure decentralised generalised transaction ledger,”
+Ethereum project yellow paper
+, vol. 151, no. 2014, pp. 1–32, 2014.
+[15]
+E. Akyildirim, A. Goncu, and A. Sensoy, “Prediction of cryptocurrency returns using machine learning,”
+Annals of Operations Research
+, vol. 297, pp. 3–36, 2021.
+[16]
+“Data from binance api,”
+https://www.binance.com/
+.
+[17]
+P. K. Roy, A. Kumar, A. Singh, and A. K. Sangaiah, “Forecasting bitcoin prices using deep learning for consumer centric industrial applications,”
+IEEE Transactions on Consumer Electronics
+, 2023.
+[18]
+J. J. Murphy,
+Technical analysis of the financial markets: A comprehensive guide to trading methods and applications
+.   Penguin, 1999.
+[19]
+J. Bollinger,
+Bollinger on Bollinger bands
+.   McGraw-Hill New York, 2002.
+[20]
+J. W. Wilder,
+New concepts in technical trading systems
+.   Trend Research, 1978.
+[21]
+D. R. Lambert, “Commodity channel index: Tool for trading cyclic trends,”
+Technical Analysis of Stocks & Commodities
+, vol. 1, p. 47, 1983.
+[22]
+L. R. Williams, “How i made one million dollars last year: trading commodities,”
+(No Title)
+, 1979.
+[23]
+S. B. Achelis, “Technical analysis from a to z,” 2001.
+[24]
+T. Chen and C. Guestrin, “Xgboost: A scalable tree boosting system,” in
+Proceedings of the 22nd acm sigkdd international conference on knowledge discovery and data mining
+, 2016, pp. 785–794.
+Generated  on Wed Oct  9 14:27:14 2024 by
+L
+a
+T
+e
+XML

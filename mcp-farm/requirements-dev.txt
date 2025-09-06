@@ -1,0 +1,20 @@
+# mcp-farm/requirements-dev.txt
+
+# Inspector + shared dev
+mcp[cli]
+python-dotenv
+
+# Indicators MCP quick run
+pandas
+pyarrow
+pandas-ta
+
+# Strategy Research MCP
+requests
+beautifulsoup4
+lxml
+PyMuPDF
+jsonschema
+langchain
+langchain-ollama
+

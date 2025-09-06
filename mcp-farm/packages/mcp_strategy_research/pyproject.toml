@@ -1,0 +1,34 @@
+[project]
+name = "mcp_strategy_research"
+version = "0.1.0"
+description = "MCP server: LLM-based strategy researcher (arXiv fast-path + Brave)"
+requires-python = ">=3.11"
+authors = [{ name = "Eeva_AI" }]
+dependencies = [
+  "mcp>=1.2.0",
+  "python-dotenv>=1.0.1",
+  "requests>=2.31.0",
+  "beautifulsoup4>=4.12.3",
+  "lxml>=5.2.2",
+  "PyMuPDF>=1.24.10",
+  "jsonschema>=4.22.0",
+  "langchain>=0.2.14",
+  "langchain-ollama>=0.1.1",
+]
+
+[project.scripts]
+strategy-research-mcp = "mcp_strategy_research.server:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+# only package our module and its subpackages
+include = ["mcp_strategy_research", "mcp_strategy_research.*"]
+# explicitly ignore any accidental top-level dirs like 'storage', tests, etc.
+exclude = ["tests*", "storage*", "dist*", "build*"]
+
+[tool.setuptools.package-data]
+# ship the JSON schema
+mcp_strategy_research = ["schemas/*.json"]

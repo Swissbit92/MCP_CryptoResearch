@@ -8,6 +8,15 @@
         "PYTHONUNBUFFERED": "1",
         "INDICATORS_MCP_PREVIEW_ROWS": "8"
       }
+    },
+    "strategy-research": {
+      "type": "stdio",
+      "command": "strategy-research-mcp",
+      "args": [],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "RESEARCH_USER_AGENT": "StrategyResearchMCP/0.1 (+contact)"
+      }
     }
   }
 }

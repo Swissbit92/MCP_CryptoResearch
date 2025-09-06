@@ -1,0 +1,42 @@
+{
+  "schema_version": "strategy.v1",
+  "name": "Unnamed Strategy",
+  "description": "",
+  "universe": [
+    "BTCUSDT"
+  ],
+  "timeframe": "1h",
+  "indicators": [],
+  "entry_rules": [
+    "RSI(window=14) crosses below 30 then crosses back above 30"
+  ],
+  "exit_rules": [
+    "RSI crosses below 70"
+  ],
+  "position_sizing": {
+    "type": "fixed_risk",
+    "risk_pct": 1.0
+  },
+  "defaults": {
+    "stop": {
+      "atr_mult": 2.0
+    },
+    "take_profit": null
+  },
+  "backtest_hints": {
+    "warmup_bars": 200,
+    "min_data": null
+  },
+  "sources": [
+    {
+      "url": "https://arxiv.org/html/2410.06935v1",
+      "doi": null
+    }
+  ],
+  "confidence": {
+    "evidence": [
+      "text-derived"
+    ],
+    "notes": "LLM-normalized"
+  }
+}
