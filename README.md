@@ -183,6 +183,11 @@ The Inspector UI opens at `http://localhost:6274` and will spawn the selected se
 - `normalize_strategy(doc, source_url, indicators[])` → schema‑v1 validation + canonicalization + persistence
 - `bundle_results(strategies[])` → write `research://results/<id>.json` (list of normalized URIs)
 
+### 🧠 Discovery helpers
+- `arxiv_search(query, max_results=10)` — direct arXiv API (no Brave key needed)
+- `ssrn_search(query, max_results=10)` — Brave allowlisted (ssrn.com / papers.ssrn.com)
+- `ideas_search(query, max_results=10)` — Brave allowlisted (ideas.repec.org)
+
 ### 📚 Resources
 - `research://raw/<sha1>.txt`           — raw text of fetched page/PDF
 - `research://normalized/<id>.json`     — one normalized strategy
