@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp_kg"
+version = "0.1.0"
+description = "Knowledge Graph MCP (TerminusDB + SHACL) for Strategy Research"
+authors = [{name="Eeva AI", email="devnull@example.org"}]
+requires-python = ">=3.10"
+dependencies = [
+  "mcp>=0.2.2",                # FastMCP server
+  "python-dotenv>=1.0.1",
+  "rdflib>=7.0.0",
+  "pyshacl>=0.25.0",
+  "terminusdb-client>=10.2.3",
+  "orjson>=3.10.7"
+]
+
+[project.scripts]
+kg-mcp = "mcp_kg.server:main"

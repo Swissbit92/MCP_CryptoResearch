@@ -1,0 +1,50 @@
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix ex:  <https://example.org/crypto-kg#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+
+########## Strategy ##########
+ex:StrategyShape a sh:NodeShape ;
+  sh:targetClass ex:Strategy ;
+  sh:property [ sh:path ex:signature ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path schema:name ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:timeframe ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:usesIndicator ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:hasRule ; sh:minCount 2 ] ;
+  sh:property [
+    sh:path ex:hasRule ;
+    sh:qualifiedValueShape [ sh:property [ sh:path ex:direction ; sh:hasValue "entry" ] ] ;
+    sh:qualifiedMinCount 1
+  ] ;
+  sh:property [
+    sh:path ex:hasRule ;
+    sh:qualifiedValueShape [ sh:property [ sh:path ex:direction ; sh:hasValue "exit" ] ] ;
+    sh:qualifiedMinCount 1
+  ] ;
+  sh:property [ sh:path ex:hasSource ; sh:minCount 1 ] .
+
+########## IndicatorUse ##########
+ex:IndicatorUseShape a sh:NodeShape ;
+  sh:targetClass ex:IndicatorUse ;
+  sh:property [ sh:path schema:name ; sh:datatype xsd:string ; sh:minCount 1 ] .
+
+########## Rule ##########
+ex:RuleShape a sh:NodeShape ;
+  sh:targetClass ex:Rule ;
+  sh:property [ sh:path ex:direction ; sh:in ("entry" "exit") ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:operator ; sh:in (">" "<" ">=" "<=" "crosses_above" "crosses_below" "==") ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:left ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:right ; sh:datatype xsd:string ; sh:minCount 1 ] .
+
+########## Whitepaper ##########
+ex:WhitepaperShape a sh:NodeShape ;
+  sh:targetClass ex:Whitepaper ;
+  sh:property [ sh:path schema:name ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:describesToken ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:authoredBy ; sh:minCount 1 ] .
+
+########## Token ##########
+ex:TokenShape a sh:NodeShape ;
+  sh:targetClass ex:Token ;
+  sh:property [ sh:path ex:symbol ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path schema:name ; sh:datatype xsd:string ; sh:minCount 1 ] .

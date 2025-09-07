@@ -17,6 +17,18 @@
         "PYTHONUNBUFFERED": "1",
         "RESEARCH_USER_AGENT": "StrategyResearchMCP/0.1 (+contact)"
       }
+    },
+    "kg": {
+      "type": "stdio",
+      "command": "kg-mcp",
+      "args": [],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "KG_STORE_BACKEND": "memory",
+        "KG_CONTEXT_PATH": "packages/mcp_kg/mcp_kg/resources/context.jsonld",
+        "KG_ONTOLOGY_PATH": "packages/mcp_kg/mcp_kg/resources/ontology.ttl",
+        "KG_SHAPES_PATH": "packages/mcp_kg/mcp_kg/resources/shapes.ttl"
+      }
     }
   }
 }
