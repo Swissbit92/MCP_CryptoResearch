@@ -32,3 +32,14 @@ exclude = ["tests*", "storage*", "dist*", "build*"]
 [tool.setuptools.package-data]
 # ship the JSON schema
 mcp_strategy_research = ["schemas/*.json"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov>=5.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["packages/mcp_strategy_research/tests"]

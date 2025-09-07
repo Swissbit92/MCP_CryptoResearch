@@ -1,0 +1,58 @@
+{
+  "schema_version": "strategy.v1",
+  "name": "RSI 14 / MACD Confirmed Pullback (fallback)",
+  "description": "Heuristic fallback when LLM is unavailable.",
+  "universe": [
+    "BTCUSDT"
+  ],
+  "timeframe": "1h",
+  "indicators": [
+    {
+      "name": "RSI",
+      "params": {
+        "window": 14
+      }
+    },
+    {
+      "name": "MACD",
+      "params": {
+        "fast": 12,
+        "slow": 26,
+        "signal": 9
+      }
+    }
+  ],
+  "entry_rules": [
+    "RSI(window=14) crosses below 30 then crosses back above 30",
+    "MACD line > signal line"
+  ],
+  "exit_rules": [
+    "RSI crosses below 70",
+    "or trailing_stop(ATR, multiple=2.0)"
+  ],
+  "position_sizing": {
+    "type": "fixed_risk",
+    "risk_pct": 1.0
+  },
+  "defaults": {
+    "stop": {
+      "atr_mult": 2.0
+    },
+    "take_profit": null
+  },
+  "backtest_hints": {
+    "warmup_bars": 200
+  },
+  "sources": [
+    {
+      "url": "https://example.org/mock-source",
+      "doi": null
+    }
+  ],
+  "confidence": {
+    "evidence": [
+      "text-derived"
+    ],
+    "notes": "LLM-normalized"
+  }
+}
