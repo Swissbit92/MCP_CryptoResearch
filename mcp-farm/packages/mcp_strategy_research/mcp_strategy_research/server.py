@@ -39,6 +39,21 @@ def plan_queries(topic: str, indicators: List[str], max_per_indicator: int = 3, 
 def brave_search(query: str, max_results: int = 10, site: str = "arxiv.org") -> List[Dict[str, str]]:
     return brave_mod.search(query=query, max_results=max_results, site=site)
 
+# NEW: clean arXiv-only tool
+@mcp.tool()
+def arxiv_search(query: str, max_results: int = 10) -> List[Dict[str, str]]:
+    return brave_mod.arxiv_search(query=query, max_results=max_results)
+
+# NEW: SSRN allowlisted search (Brave-backed)
+@mcp.tool()
+def ssrn_search(query: str, max_results: int = 10) -> List[Dict[str, str]]:
+    return brave_mod.ssrn_search(query=query, max_results=max_results)
+
+# NEW: IDEAS/RePEc allowlisted search (Brave-backed)
+@mcp.tool()
+def ideas_search(query: str, max_results: int = 10) -> List[Dict[str, str]]:
+    return brave_mod.ideas_search(query=query, max_results=max_results)
+
 @mcp.tool()
 def fetch_url(url: str, render_js: bool = False) -> Dict[str, Any]:
     return fetch_mod.fetch_url(url, render_js=render_js)

@@ -1,0 +1,64 @@
+{
+  "schema_version": "strategy.v1",
+  "name": "BTC Momentum Reversal",
+  "description": "A strategy that buys BTC when momentum reverses from oversold to overbought conditions.",
+  "universe": [
+    "BTCUSDT"
+  ],
+  "timeframe": "1h",
+  "indicators": [
+    {
+      "name": "RSI",
+      "params": {
+        "period": 14
+      }
+    },
+    {
+      "name": "MACD",
+      "params": {
+        "fast_period": 12,
+        "slow_period": 26,
+        "signal_period": 9
+      }
+    },
+    {
+      "name": "ATR",
+      "params": {}
+    }
+  ],
+  "entry_rules": [
+    "RSI crosses below 30 and then crosses back above 30",
+    "MACD line is above its signal line"
+  ],
+  "exit_rules": [
+    "RSI crosses above 70 and then crosses back below 70",
+    "Trailing stop hit (2.0× ATR)"
+  ],
+  "position_sizing": {
+    "type": "fixed_risk",
+    "risk_pct": 1.0
+  },
+  "defaults": {
+    "stop_loss": "2.0× ATR",
+    "take_profit": null
+  },
+  "backtest_hints": {
+    "notes": [
+      "Use 1-hour BTC data",
+      "Monitor RSI and MACD for entry signals",
+      "Apply trailing stop based on ATR"
+    ]
+  },
+  "sources": [
+    {
+      "url": "https://example.org/mock-source",
+      "doi": null
+    }
+  ],
+  "confidence": {
+    "evidence": [
+      "text-derived"
+    ],
+    "notes": "LLM-normalized"
+  }
+}
