@@ -20,14 +20,13 @@
     },
     "kg": {
       "type": "stdio",
-      "command": "kg-mcp",
-      "args": [],
+      "command": "python",
+      "args": ["-m", "mcp_kg.server"],
       "env": {
         "PYTHONUNBUFFERED": "1",
         "KG_STORE_BACKEND": "memory",
-        "KG_CONTEXT_PATH": "packages/mcp_kg/mcp_kg/resources/context.jsonld",
-        "KG_ONTOLOGY_PATH": "packages/mcp_kg/mcp_kg/resources/ontology.ttl",
-        "KG_SHAPES_PATH": "packages/mcp_kg/mcp_kg/resources/shapes.ttl"
+        "KG_ONTOLOGY_PATH": "packages/mcp_kg/mcp_kg/ontology/crypto_kg.ttl",
+        "KG_SHAPES_PATH": "packages/mcp_kg/mcp_kg/ontology/crypto_kg_shapes.ttl"
       }
     }
   }

@@ -1,0 +1,4 @@
+PREFIX kg:   <http://example.org/kg#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+# You will fill this via Python (INSERT DATA) per strategy instance composed from JSON.
+# Using INSERT DATA avoids accidental deletes until you implement idempotent MERGE patterns.

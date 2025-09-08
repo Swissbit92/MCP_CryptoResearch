@@ -1,0 +1,64 @@
+@prefix kg:   <http://example.org/kg#> .
+@prefix ind:  <http://example.org/indicator#> .
+@prefix rule: <http://example.org/rule#> .
+@prefix strat:<http://example.org/strategy#> .
+@prefix iu:   <http://example.org/indicatorUsage#> .
+@prefix asset:<http://example.org/asset#> .
+@prefix tf:   <http://example.org/timeframe#> .
+@prefix doc:  <http://example.org/doc#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+##########
+# Demo assets/timeframes
+##########
+asset:BTCUSDT a kg:Asset ;
+  kg:symbol "BTCUSDT" .
+
+tf:1h a kg:Timeframe ;
+  kg:tfName "1h" .
+
+##########
+# Indicators (mark SKOS concepts also as kg:Indicator for GraphQL convenience)
+##########
+ind:RSI  a kg:Indicator ; rdfs:label "RSI" .
+ind:MACD a kg:Indicator ; rdfs:label "MACD" .
+ind:ATR  a kg:Indicator ; rdfs:label "ATR" .
+
+##########
+# Demo Strategy: RSI+MACD+ATR Swing
+##########
+strat:rsi_macd_atr_swing a kg:Strategy ;
+  kg:name "RSI MACD ATR Swing" ;
+  kg:family "indicator" ;
+  kg:hasEntryRule rule:e1 ;
+  kg:hasExitRule  rule:x1 ;
+  kg:targetsAsset asset:BTCUSDT ;
+  kg:targetsTimeframe tf:1h ;
+  kg:usesIndicator iu:rsi_entry, iu:macd_confirm, iu:atr_stop .
+
+# Entry: RSI crosses below 30 then above 30 AND MACD_line > MACD_signal
+rule:e1 a kg:EntryRule ;
+  kg:dsl """RSI(14) crosses_below 30 THEN crosses_above 30 WITHIN 10 bars AND MACD_line > MACD_signal""" ;
+  kg:usesIndicators ind:RSI, ind:MACD .
+
+# Exit: RSI crosses below 70 OR trailing_stop(ATR(14), multiple=2)
+rule:x1 a kg:ExitRule ;
+  kg:dsl """RSI(14) crosses_below 70 OR trailing_stop(ATR(14), multiple=2)""" ;
+  kg:usesIndicators ind:RSI, ind:ATR .
+
+# IndicatorUsage instances
+iu:rsi_entry a kg:IndicatorUsage ;
+  kg:ofIndicator ind:RSI ;
+  kg:role "entry" ;
+  kg:params "{\"period\":14,\"overSold\":30,\"overBought\":70}" .
+
+iu:macd_confirm a kg:IndicatorUsage ;
+  kg:ofIndicator ind:MACD ;
+  kg:role "confirm" ;
+  kg:params "{\"fast\":12,\"slow\":26,\"signal\":9}" .
+
+iu:atr_stop a kg:IndicatorUsage ;
+  kg:ofIndicator ind:ATR ;
+  kg:role "stop" ;
+  kg:params "{\"period\":14,\"multiple\":2}" .

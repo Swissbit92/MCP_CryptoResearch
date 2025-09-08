@@ -1,0 +1,14 @@
+PREFIX kg:   <http://example.org/kg#>
+PREFIX ind:  <http://example.org/indicator#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Parameters to substitute: ?iri ?canonical ?alt1 ?alt2 ...
+
+DELETE { ?iri ?p ?o }
+INSERT {
+  ?iri a kg:Indicator ;
+       rdfs:label ?canonical .
+}
+WHERE {
+  OPTIONAL { ?iri ?p ?o }
+}

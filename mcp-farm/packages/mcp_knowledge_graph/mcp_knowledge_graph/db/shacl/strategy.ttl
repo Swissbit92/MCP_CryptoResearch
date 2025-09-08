@@ -1,0 +1,20 @@
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix kg:  <http://example.org/kg#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+kg:StrategyShape a sh:NodeShape ;
+  sh:targetClass kg:Strategy ;
+  sh:property [
+    sh:path kg:name ;
+    sh:datatype xsd:string ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path kg:family ;
+    sh:in ("indicator" "ml" "hybrid") ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path kg:hasEntryRule ;
+    sh:minCount 1
+  ] .

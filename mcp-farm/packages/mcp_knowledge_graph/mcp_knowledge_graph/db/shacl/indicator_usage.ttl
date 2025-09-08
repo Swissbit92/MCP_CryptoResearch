@@ -1,0 +1,15 @@
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix kg:  <http://example.org/kg#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+kg:IndicatorUsageShape a sh:NodeShape ;
+  sh:targetClass kg:IndicatorUsage ;
+  sh:property [
+    sh:path kg:ofIndicator ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path kg:role ;
+    sh:in ("entry" "exit" "filter" "stop") ;
+    sh:minCount 1
+  ] .

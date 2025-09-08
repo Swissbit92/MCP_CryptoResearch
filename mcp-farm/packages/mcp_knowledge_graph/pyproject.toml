@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-knowledge-graph"
+version = "0.1.0"
+description = "GraphDB-backed Knowledge Graph MCP (ontology + SHACL + GraphQL/SPARQL + thin upserts)"
+requires-python = ">=3.11"
+authors = [{ name = "Eeva_AI" }]
+dependencies = [
+  "requests>=2.32.0",
+  "rdflib>=7.0.0",
+  "python-slugify>=8.0.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mcp_knowledge_graph*"]
+
+[tool.setuptools.package-data]
+mcp_knowledge_graph = [
+  "ontology/*.ttl",
+  "db/shacl/*.ttl",
+  "db/sparql/*.sparql",
+  "db/schema/jsonld/*.json",
+  "queries/*.graphql"
+]

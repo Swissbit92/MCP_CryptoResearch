@@ -1,0 +1,11 @@
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix kg:  <http://example.org/kg#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+kg:RuleShape a sh:NodeShape ;
+  sh:targetClass kg:Rule ;
+  sh:property [
+    sh:path kg:dsl ;
+    sh:datatype xsd:string ;
+    sh:minCount 1
+  ] .

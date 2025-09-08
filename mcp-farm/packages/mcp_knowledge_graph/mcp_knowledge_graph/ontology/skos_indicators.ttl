@@ -1,0 +1,22 @@
+@prefix kg:   <http://example.org/kg#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+kg:Indicator a skos:ConceptScheme .
+
+# RSI
+<http://example.org/indicator#RSI> a skos:Concept ;
+  skos:inScheme kg:Indicator ;
+  skos:prefLabel "RSI" ;
+  skos:altLabel "Relative Strength Index" .
+
+# MACD
+<http://example.org/indicator#MACD> a skos:Concept ;
+  skos:inScheme kg:Indicator ;
+  skos:prefLabel "MACD" ;
+  skos:altLabel "Moving Average Convergence Divergence" .
+
+# ATR
+<http://example.org/indicator#ATR> a skos:Concept ;
+  skos:inScheme kg:Indicator ;
+  skos:prefLabel "ATR" ;
+  skos:altLabel "Average True Range" .

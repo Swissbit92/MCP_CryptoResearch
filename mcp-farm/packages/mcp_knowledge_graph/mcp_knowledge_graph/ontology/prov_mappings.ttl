@@ -1,0 +1,16 @@
+@prefix kg:   <http://example.org/kg#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+kg:ExtractionEvent a prov:Activity .
+kg:NormalizationEvent a prov:Activity .
+kg:IngestEvent a prov:Activity .
+
+kg:wasDerivedFrom a prov:wasDerivedFrom .
+kg:wasGeneratedBy a prov:wasGeneratedBy .
+
+kg:toolName a prov:label .
+kg:toolVersion a prov:label .
+kg:runId a prov:qualifiedAssociation .
+
+kg:timestamp a prov:generatedAtTime ; a prov:endedAtTime .

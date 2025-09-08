@@ -1,0 +1,22 @@
+query StrategyByIntent(
+  $asset: String!, $timeframe: String!,
+  $indicators: [String!], $text: String
+) {
+  strategies(
+    where: {
+      targetsAsset: { some: { symbol: { eq: $asset } } }
+      targetsTimeframe: { some: { tfName: { eq: $timeframe } } }
+      indicatorUsages: { some: { ofIndicator: { label: { in: $indicators } } } }
+      entryRules: { some: { dsl: { contains: $text } } }
+    }
+  ) {
+    id
+    name
+    family
+    entryRules { dsl }
+    exitRules  { dsl }
+    indicatorUsages { role params ofIndicator { label } }
+    parameters { paramName paramValue paramType paramScope }
+    sourcedFrom { title url doi }
+  }
+}

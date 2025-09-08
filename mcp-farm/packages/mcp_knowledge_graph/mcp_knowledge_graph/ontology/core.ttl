@@ -1,0 +1,74 @@
+@prefix kg:   <http://example.org/kg#> .
+@prefix ind:  <http://example.org/indicator#> .
+@prefix rule: <http://example.org/rule#> .
+@prefix param:<http://example.org/param#> .
+@prefix bt:   <http://example.org/backtest#> .
+@prefix doc:  <http://example.org/doc#> .
+@prefix asset:<http://example.org/asset#> .
+@prefix tf:   <http://example.org/timeframe#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+kg:Strategy a owl:Class .
+kg:Indicator a owl:Class .
+kg:IndicatorUsage a owl:Class .
+kg:Rule a owl:Class .
+kg:EntryRule a owl:Class ; rdfs:subClassOf kg:Rule .
+kg:ExitRule  a owl:Class ; rdfs:subClassOf kg:Rule .
+kg:Parameter a owl:Class .
+kg:BacktestResult a owl:Class .
+kg:Asset a owl:Class .
+kg:Timeframe a owl:Class .
+kg:DocumentChunk a owl:Class .
+kg:Paper a owl:Class .  # schema.org CreativeWork analog
+
+# Strategy relationships
+kg:usesIndicator a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:IndicatorUsage .
+kg:hasEntryRule a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:EntryRule .
+kg:hasExitRule  a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:ExitRule .
+kg:hasParameter a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:Parameter .
+kg:testedOn     a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:BacktestResult .
+kg:sourcedFrom  a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:Paper .
+kg:targetsAsset a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:Asset .
+kg:targetsTimeframe a owl:ObjectProperty ; rdfs:domain kg:Strategy ; rdfs:range kg:Timeframe .
+
+# Rule relationships
+kg:usesIndicators a owl:ObjectProperty ; rdfs:domain kg:Rule ; rdfs:range kg:Indicator .
+kg:supportedBy a owl:ObjectProperty ; rdfs:domain kg:Rule ; rdfs:range kg:DocumentChunk .
+
+# IndicatorUsage
+kg:ofIndicator a owl:ObjectProperty ; rdfs:domain kg:IndicatorUsage ; rdfs:range kg:Indicator .
+
+# Data properties (selected)
+kg:name a owl:DatatypeProperty ; rdfs:domain kg:Strategy ; rdfs:range xsd:string .
+kg:family a owl:DatatypeProperty ; rdfs:domain kg:Strategy ; rdfs:range xsd:string .
+kg:summary a owl:DatatypeProperty ; rdfs:domain kg:Strategy ; rdfs:range xsd:string .
+kg:confidence a owl:DatatypeProperty ; rdfs:domain kg:Strategy ; rdfs:range xsd:decimal .
+
+kg:dsl a owl:DatatypeProperty ; rdfs:domain kg:Rule ; rdfs:range xsd:string .
+kg:ast a owl:DatatypeProperty ; rdfs:domain kg:Rule ; rdfs:range xsd:string . # JSON-serialized
+kg:sequenceWindow a owl:DatatypeProperty ; rdfs:domain kg:Rule ; rdfs:range xsd:string .
+
+kg:params a owl:DatatypeProperty ; rdfs:domain kg:IndicatorUsage ; rdfs:range xsd:string . # JSON-serialized
+kg:role   a owl:DatatypeProperty ; rdfs:domain kg:IndicatorUsage ; rdfs:range xsd:string . # entry|exit|filter|stop
+
+kg:paramName a owl:DatatypeProperty ; rdfs:domain kg:Parameter ; rdfs:range xsd:string .
+kg:paramValue a owl:DatatypeProperty ; rdfs:domain kg:Parameter ; rdfs:range xsd:string .
+kg:paramType a owl:DatatypeProperty ; rdfs:domain kg:Parameter ; rdfs:range xsd:string . # constant|range
+kg:paramScope a owl:DatatypeProperty ; rdfs:domain kg:Parameter ; rdfs:range xsd:string . # global|per_indicator|risk
+
+kg:symbol a owl:DatatypeProperty ; rdfs:domain kg:Asset ; rdfs:range xsd:string .
+kg:tfName a owl:DatatypeProperty ; rdfs:domain kg:Timeframe ; rdfs:range xsd:string .
+
+kg:text a owl:DatatypeProperty ; rdfs:domain kg:DocumentChunk ; rdfs:range xsd:string .
+kg:page a owl:DatatypeProperty ; rdfs:domain kg:DocumentChunk ; rdfs:range xsd:integer .
+kg:section a owl:DatatypeProperty ; rdfs:domain kg:DocumentChunk ; rdfs:range xsd:string .
+kg:hash a owl:DatatypeProperty ; rdfs:domain kg:DocumentChunk ; rdfs:range xsd:string .
+
+kg:title a owl:DatatypeProperty ; rdfs:domain kg:Paper ; rdfs:range xsd:string .
+kg:url a owl:DatatypeProperty ; rdfs:domain kg:Paper ; rdfs:range xsd:string .
+kg:doi a owl:DatatypeProperty ; rdfs:domain kg:Paper ; rdfs:range xsd:string .
+kg:year a owl:DatatypeProperty ; rdfs:domain kg:Paper ; rdfs:range xsd:gYear .

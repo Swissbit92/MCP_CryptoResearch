@@ -1,0 +1,11 @@
+query EvidenceByRule($ruleId: ID!) {
+  rule(id: $ruleId) {
+    dsl
+    supportedBy {
+      text
+      page
+      section
+      fromDocument { title url doi }
+    }
+  }
+}
