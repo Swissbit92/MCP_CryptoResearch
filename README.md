@@ -1,8 +1,11 @@
-# 🧪 MCP Farm (Monorepo) — Indicators MCP ✅ • Strategy Research MCP ✅
+# 🧪 MCP Farm (Monorepo) — Indicators MCP + Strategy Research MCP
 
 Welcome! This repo hosts a **farm of MCP servers** for quantitative research and trading.
-- **Indicators MCP** — compute + validate TA indicators over your OHLCV data.
-- **Strategy Research MCP** — LLM-powered researcher that finds papers (arXiv fast‑path + Brave), extracts TA rules, and normalizes results into a JSON schema.
+
+**Status**
+- ✅ `mcp_indicators` — compute/validate TA indicators (pandas_ta backend).
+- ✅ `mcp_strategy_research` — LLM-based strategy researcher (arXiv fast‑path + Brave Search + Ollama).
+- ✅ Inspector config and smoke tests.
 
 ---
 
@@ -11,37 +14,37 @@ Welcome! This repo hosts a **farm of MCP servers** for quantitative research and
 ```
 mcp-farm/
 ├─ mcp.json                      # Inspector config (stdio) → launches both servers
-├─ .env                          # runtime knobs (Brave key, Ollama model, etc.)
+├─ .env                          # runtime knobs (BRAVE_API_KEY, OLLAMA_MODEL, etc.)
 ├─ libs/
-│  └─ mcp_common/                # shared helpers (URIs, schemas, etc.)
+│  └─ mcp_common/
 │     ├─ pyproject.toml
 │     └─ mcp_common/
-│        └─ uri.py               # (example shared util)
+│        └─ uri.py
 └─ packages/
    ├─ mcp_indicators/
    │  ├─ pyproject.toml
    │  └─ mcp_indicators/
-   │     ├─ server.py            # FastMCP server entrypoint
+   │     ├─ server.py
    │     └─ indicators/
-   │        ├─ registry.py       # metadata + validation + compute()
+   │        ├─ registry.py
    │        └─ backends/
    │           └─ pandas_ta_backend.py
    └─ mcp_strategy_research/
       ├─ pyproject.toml
       └─ mcp_strategy_research/
-         ├─ server.py            # FastMCP server entrypoint
-         ├─ brave.py             # Brave + arXiv search helpers
-         ├─ fetcher.py           # robots-aware fetch (HTML/PDF → text)
-         ├─ extractor.py         # LangChain + Ollama extractor (LLM-first with fallback)
-         ├─ normalizer.py        # JSON schema v1 validation + storage
-         ├─ prompts.py           # query planning & extraction prompts
+         ├─ server.py
+         ├─ brave.py               # Brave & arXiv search (arXiv API fast-path)
+         ├─ fetcher.py             # robots-aware fetcher (HTML/PDF → text)
+         ├─ extractor.py           # LLM extractor (LangChain + OllamaLLM)
+         ├─ normalizer.py          # JSON schema (strategy.v1) coercion + save
+         ├─ prompts.py             # query planner + extraction prompt builder
+         ├─ storage.py             # resource URIs (research://...)
          ├─ host_helpers/
          │  └─ indicator_synonyms.py  # build llm_hint from Indicators MCP metadata
-         ├─ schemas/
-         │  └─ strategy_v1.json  # normalized strategy schema (packaged)
-         ├─ storage/             # research:// raw/normalized/results artifacts
-         └─ tests/
-            └─ test_smoke_pipeline.py
+         └─ schemas/
+            └─ strategy_v1.json
+      └─ tests/
+         └─ test_smoke_pipeline.py
 ```
 
 ---
@@ -50,78 +53,21 @@ mcp-farm/
 
 - 🐍 **Python 3.11** (virtual environment recommended)
 - 🪟 **Windows + PowerShell** (tested on Win 11)
-- 📦 **pip**
-- ⚙️ **Node.js LTS** (for the MCP Inspector UI) — `winget install OpenJS.NodeJS.LTS`
-- 🧠 **Ollama** (for the Strategy Research MCP extractor)
-  - Recommended default in `.env`: `qwen2.5:14b-instruct` (fallback `llama3.1:8b`)
-  - Ensure `ollama serve` is running and the models are pulled:  
-    `ollama pull qwen2.5:14b-instruct` and `ollama pull llama3.1:8b`
-- 🔎 **Brave Search API key** (optional but recommended; arXiv fast‑path works without it)
+- ⚙️ **Node.js LTS** for the MCP Inspector UI (`npx`)
+- 🧠 **Ollama** running locally (default at `http://localhost:11434`)
+  - Recommended model (reasoning‑friendly): `qwen2.5:14b-instruct`
+  - Fallback: `llama3.1:8b-instruct`
+- 🔎 **(Optional) Brave Search API key** for broader web search
+  - arXiv queries use the **arXiv API** fast‑path and do not require Brave.
 
 ---
 
-## ⚙️ Configuration Files
+## 🚀 Setup (Windows / PowerShell)
 
-### 📄 `mcp.json` (Inspector config)
+> All commands from repo root: `...\\mcp-farm>`
 
-The repo’s `mcp.json` defines two stdio servers:
+### 1) Create & activate venv, update pip
 
-```jsonc
-{
-  "mcpServers": {
-    "indicators": {
-      "type": "stdio",
-      "command": "indicators-mcp",
-      "args": [],
-      "env": { "PYTHONUNBUFFERED": "1", "INDICATORS_MCP_PREVIEW_ROWS": "8" }
-    },
-    "strategy-research": {
-      "type": "stdio",
-      "command": "strategy-research-mcp",
-      "args": [],
-      "env": { "PYTHONUNBUFFERED": "1", "RESEARCH_USER_AGENT": "StrategyResearchMCP/0.1 (+contact)" }
-    }
-  }
-}
-```
-
-> If Inspector says “Multiple servers found in config file. Please specify one with --server.”, start with e.g.:
-> ```powershell
-> npx @modelcontextprotocol/inspector --config .\mcp.json --server indicators
-> npx @modelcontextprotocol/inspector --config .\mcp.json --server strategy-research
-> ```
-
-### 🌿 `.env` (runtime knobs)
-
-> Read at startup via `python-dotenv`.
-
-```env
-# Indicators MCP
-INDICATORS_MCP_PREVIEW_ROWS=8
-INDICATORS_MCP_LOG_LEVEL=INFO
-INDICATORS_MCP_BACKEND=pandas_ta
-INDICATORS_MCP_MAX_ROWS=200000
-INDICATORS_MCP_TIMEOUT_MS=10000
-
-# Strategy Research MCP
-BRAVE_API_KEY= <your_brave_key>       # optional; arXiv API fast-path works without it
-RESEARCH_MAX_CONCURRENCY=4
-RESEARCH_USER_AGENT=StrategyResearchMCP/0.1 (+contact)
-
-# Ollama (LLM extractor)
-OLLAMA_MODEL=qwen2.5:14b-instruct
-OLLAMA_MODEL_FALLBACK=llama3.1:8b-instruct
-```
-
-> Tip: If you change `.env`, restart the server process that loaded it.
-
----
-
-## 🚀 Quick Start (Windows / PowerShell)
-
-Run from repo root: `...\mcp-farm>`
-
-### 1) Create & activate a venv + upgrade pip
 ```powershell
 py -3.11 -m venv ..\MCP_CryptoResearch
 ..\MCP_CryptoResearch\Scripts\Activate.ps1
@@ -129,129 +75,197 @@ python -m pip install --upgrade pip
 ```
 
 ### 2) Install local packages (editable)
+
 ```powershell
 pip install -e libs\mcp_common
 pip install -e packages\mcp_indicators
 pip install -e packages\mcp_strategy_research
 ```
 
-### 3) (Optional) Pull Ollama models
+### 3) (Optional) Test dependencies
+
 ```powershell
+python -m pip install -U pytest
+```
+
+### 4) Install Node (if needed)
+
+```powershell
+# Ensure Node is on PATH for npx
+node -v; npm -v; npx -v
+```
+
+### 5) Run Ollama & pull models
+
+```powershell
+# In a separate shell or before running tests
+ollama --version
 ollama pull qwen2.5:14b-instruct
 ollama pull llama3.1:8b-instruct
 ```
 
-### 4) Launch Inspector for each server (separately)
-```powershell
-# Indicators MCP
-npx @modelcontextprotocol/inspector --config .\mcp.json --server indicators
+---
 
+## ⚙️ Configuration
+
+### `.env`
+
+Put at repo root. Loaded automatically (via `python-dotenv`).
+
+```env
 # Strategy Research MCP
+RESEARCH_USER_AGENT=StrategyResearchMCP/0.1 (+contact)
+RESEARCH_MAX_CONCURRENCY=4
+BRAVE_API_KEY=your_key_if_you_have_one
+
+# Ollama (LangChain OllamaLLM)
+OLLAMA_MODEL=qwen2.5:14b-instruct
+OLLAMA_MODEL_FALLBACK=llama3.1:8b-instruct
+# OLLAMA_HOST=http://localhost:11434  # default; set if non-standard
+```
+
+### `mcp.json` (Inspector config)
+
+Already included in repo. It launches both servers with stdio:
+
+```json
+{
+  "mcpServers": {
+    "indicators": {
+      "type": "stdio",
+      "command": "indicators-mcp",
+      "args": [],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "INDICATORS_MCP_PREVIEW_ROWS": "8"
+      }
+    },
+    "strategy-research": {
+      "type": "stdio",
+      "command": "strategy-research-mcp",
+      "args": [],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "RESEARCH_USER_AGENT": "StrategyResearchMCP/0.1 (+contact)"
+      }
+    }
+  }
+}
+```
+
+> **Tip (Windows JSON encoding):** Ensure the file is UTF‑8 **without BOM**.
+
+---
+
+## ▶️ Running (Inspector UI)
+
+Launch Inspector and choose a server:
+
+```powershell
+npx @modelcontextprotocol/inspector --config .\mcp.json --server indicators
 npx @modelcontextprotocol/inspector --config .\mcp.json --server strategy-research
 ```
 
-The Inspector UI opens at `http://localhost:6274` and will spawn the selected server via stdio.
+The UI opens at `http://localhost:6274` and connects via stdio.
 
 ---
 
 ## 🧠 Indicators MCP — What It Exposes
 
-### 🛠️ Tools
+**Tools**
 - `list_indicators()` → `["RSI","SMA","EMA", ...]`
-- `describe_indicator(name)` → metadata (params, outputs, etc.)
-- `validate_params(name, params?)` → fill defaults + check types/ranges
-- `load_csv_dataset(dataset_id, path, date_col?, tz?)` → load into memory
-- `compute_indicator(dataset_id, name, params?, backend="pandas_ta")` → mutates DF, returns `{new_columns, spec, row_count}`
-- `preview_ohlcv(dataset_id, limit=5)` → first N rows
+- `describe_indicator(name)` → metadata (params, outputs)
+- `validate_params(name, params?)` → fill defaults + validate
+- `load_csv_dataset(dataset_id, path, date_col?, tz?)`
+- `compute_indicator(dataset_id, name, params?, backend="pandas_ta")`
+- `preview_ohlcv(dataset_id, limit=5)`
 
-### 📚 Resources
-- `indicators://index` → list of indicator names
-- `indicators://{name}` → descriptor JSON
-- `ohlcv://{dataset_id}` → table preview (rows controlled by `INDICATORS_MCP_PREVIEW_ROWS`)
-
-> Entry point: `python -m mcp_indicators.server` (used by the `indicators-mcp` script).
+**Resources**
+- `indicators://index` (list of indicator names)
+- `indicators://{name}` (descriptor)
+- `ohlcv://{dataset_id}` (preview table; row count via `INDICATORS_MCP_PREVIEW_ROWS`)
 
 ---
 
-## 🔎 Strategy Research MCP — What It Exposes (v0.1)
+## 🔎 Strategy Research MCP — Flow & Surface
 
-### 🧩 Tools
-- `plan_queries(topic, indicators[], max_per_indicator=3, source="arxiv")` → heuristic query strings
-- `brave_search(query, max_results=10, site="arxiv.org")` → arXiv API fast‑path, Brave fallback
-- `fetch_url(url, render_js=false)` → respects robots.txt + throttles (~1–2 req/s), extracts text (HTML/PDF)
-- `extract_strategies(text, indicators[]?, llm_hint?)` → LLM extractor (LangChain `OllamaLLM`), synonyms bias via `llm_hint`
-- `normalize_strategy(doc, source_url, indicators[])` → schema‑v1 validation + canonicalization + persistence
-- `bundle_results(strategies[])` → write `research://results/<id>.json` (list of normalized URIs)
+**Goal (v0.1):** Given a topic & indicator list, find arXiv/WWW pages, extract TA strategies via LLM, normalize to a **strategy.v1** JSON schema, and save reproducible artifacts as **resources**.
 
-### 🧠 Discovery helpers
-- `arxiv_search(query, max_results=10)` — direct arXiv API (no Brave key needed)
-- `ssrn_search(query, max_results=10)` — Brave allowlisted (ssrn.com / papers.ssrn.com)
-- `ideas_search(query, max_results=10)` — Brave allowlisted (ideas.repec.org)
+**Tools**
+- `plan_queries(topic, indicators[], max_per_indicator=3, source="arxiv")` → list of search strings.
+- `brave_search(query, max_results=10, site="arxiv.org")` → results `[{title,url,snippet}]`.
+  - arXiv fast‑path uses the **arXiv API**, then falls back to Brave (`BRAVE_API_KEY` optional).
+- `fetch_url(url, render_js=false)` → `{url, content_type, text, meta, resource_uri}`; PDF→text via PyMuPDF; robots + 1–2 req/s throttle.
+- `extract_strategies(text, indicators[]?, llm_hint?)` → LLM candidates (LangChain **OllamaLLM**). Falls back to a deterministic template if LLM unavailable.
+- `normalize_strategy(doc, source_url, indicators[])` → validates/coerces to **strategy.v1**, writes a resource JSON; returns `{uri, json}`.
+- `bundle_results(strategies[])` → writes `research://results/<id>.json` and returns its URI.
 
-### 📚 Resources
-- `research://raw/<sha1>.txt`           — raw text of fetched page/PDF
-- `research://normalized/<id>.json`     — one normalized strategy
-- `research://results/<id>.json`        — bundle of strategy URIs + timestamp
+**Resources**
+- `research://raw/<sha1>.txt` — raw page/PDF text.
+- `research://normalized/<id>.json` — one normalized strategy.
+- `research://results/<id>.json` — list of normalized strategies with creation ts.
 
-### 🧠 LLM Hint (synonyms) — Host‑side helper
-Use the included helper to build a JSON `llm_hint` from your canonical indicators + synonyms (often from Indicators MCP metadata):
+**Prompts**
+- `strategy_extraction_guidelines` — informational prompt.
+- The extractor composes a system prompt from indicator names + optional synonyms (see below).
+
+**Synonyms (host → llm_hint)**
+Use `packages/mcp_strategy_research/mcp_strategy_research/host_helpers/indicator_synonyms.py`:
 
 ```python
 from mcp_strategy_research.host_helpers.indicator_synonyms import build_llm_hint_from_registry
 
-canonical = ["RSI","MACD","ATR"]
-registry_synonyms = {
+indicators = ["RSI","MACD","ATR"]
+synonyms_map = {
   "RSI":  ["Relative Strength Index"],
   "MACD": ["Moving Average Convergence Divergence"],
   "ATR":  ["Average True Range"],
 }
-llm_hint = build_llm_hint_from_registry(canonical, registry_synonyms)
-# -> '{"synonyms":{"ATR":["Average True Range"],"MACD":["Moving Average Convergence Divergence"],"RSI":["Relative Strength Index"]}}'
+llm_hint = build_llm_hint_from_registry(indicators, synonyms_map)
+# -> JSON string: {"synonyms":{"RSI":["Relative Strength Index"], ...}}
 ```
 
-Pass that `llm_hint` string into `extract_strategies(...)` to bias the LLM toward mapping synonyms to canonical names.
-
-### 🔒 Politeness & Limits
-- `fetcher.py` enforces robots.txt checks and a global throttle (≈ 0.6s between requests).
-- PDF text extraction uses PyMuPDF (`fitz`).
-- JS rendering is **off** by default; leave it off unless you truly need it.
+Pass `llm_hint` to `extract_strategies(...)` to bias canonicalization.
 
 ---
 
-## ✅ Smoke Test
+## ✅ Smoke Tests
 
-A tiny end‑to‑end smoke test is included for the Strategy Research MCP.
+### Pytest (end‑to‑end extractor → normalizer)
 
 ```powershell
 python -m pytest packages\mcp_strategy_research\tests\test_smoke_pipeline.py -q
-# Expected: 1 passed
 ```
 
-The test:
-1. Builds an `llm_hint` using the helper above.
-2. Runs the extractor (LLM if available; falls back to a deterministic template).
-3. Normalizes into schema‑v1 and writes artifacts under `packages/mcp_strategy_research/mcp_strategy_research/storage/`.
-4. Asserts schema validity and presence of required fields.
-
-> Note: Running the test does **not** hit the network and will pass even if Ollama is unavailable (fallback path).
+- If **Ollama** is running with the models pulled, the LLM path is used.
+- If not, the extractor falls back to a deterministic template, and the test still passes.
 
 ---
 
-## 🛠️ Dev Tips
+## 🛡️ Politeness & Limits
 
-- Re‑run `pip install -e` after adding new packages or entry points.
-- Keep shared contracts/JSON Schemas in `libs/mcp_common` or package `schemas/`.
-- For Windows JSON files (like `mcp.json`), ensure **UTF‑8 without BOM** to avoid Inspector parse issues.
-- If Inspector reports multiple servers, select one with `--server`.
-- Ollama: keep `ollama serve` running; confirm models are available with `ollama list`.
+- `fetch_url` respects **robots.txt** and throttles to ~**1–2 req/s** globally.
+- JS rendering is **off by default** (set `render_js=true` only when needed).
+- arXiv search path uses the **official API** first; Brave is an optional fallback.
+- Missing `BRAVE_API_KEY` → `brave_search` will just return an empty list for non‑arXiv sites.
+
+---
+
+## 🔧 Troubleshooting
+
+- **Inspector shows no servers** → ensure `--server indicators` or `--server strategy-research` is passed.
+- **Ollama connection issues** → verify `OLLAMA_HOST` and that the models are pulled.
+- **Validation errors in `normalize_strategy`** → the normalizer coerces rule objects → strings, canonicalizes indicators, and fixes `sources`. If input is too malformed, it raises a schema error.
+- **Windows JSON BOM errors** → make sure JSON files are UTF‑8 without BOM.
 
 ---
 
 ## 🧭 Roadmap
 
-- **Strategy Research MCP**: extend sources (SSRN, selected blogs & forums), dedupe/merge, retry fan‑out.
-- **Backtester MCP**: wrap a backtest runner; return metrics + equity curve as resources.
-- **Orchestrator (LangGraph)**: optional coordinator to chain Research → Generator → Backtester.
+- Add more sources (SSRN, reputable blogs) behind the same tool surface.
+- Fan‑out orchestration (LangGraph), retries & de‑dup across sources.
+- Strategy Generator MCP + Backtester MCP chain.
+- Richer indicator synonym ingestion by calling the Indicators MCP registry on the host side.
 
 ---
 

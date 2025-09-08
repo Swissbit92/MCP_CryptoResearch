@@ -1,0 +1,192 @@
+{
+  "@context": {
+    "rdf":    "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs":   "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd":    "http://www.w3.org/2001/XMLSchema#",
+    "owl":    "http://www.w3.org/2002/07/owl#",
+    "dcterms":"http://purl.org/dc/terms/",
+    "schema": "https://schema.org/",
+    "prov":   "http://www.w3.org/ns/prov#",
+    "foaf":   "http://xmlns.com/foaf/0.1/",
+    "bibo":   "http://purl.org/ontology/bibo/",
+    "fibo":   "https://spec.edmcouncil.org/fibo/ontology/",
+    "blon":   "http://purl.org/blondie/ontology/",
+    "ethon":  "http://ethon.consensys.net/ontology#",
+    "wd":     "http://www.wikidata.org/entity/",
+    "ex":     "http://example.org/kg#",
+    "conformsTo": "dcterms:conformsTo",
+    "sameAs":     "schema:sameAs",
+    "name":       "schema:name",
+    "description":"schema:description",
+    "url":        "schema:url",
+    "identifier": "schema:identifier",
+    "created":    "dcterms:created",
+    "modified":   "dcterms:modified"
+  },
+  "@graph": [
+    {
+      "@id": "ex:Ontology",
+      "@type": "owl:Ontology",
+      "name": "Crypto Research KG",
+      "description": "Standards-aligned ontology for MCP-driven crypto research and trading knowledge graph.",
+      "conformsTo": [
+        "https://schema.org/",
+        "http://www.w3.org/ns/prov#",
+        "http://purl.org/ontology/bibo/",
+        "https://spec.edmcouncil.org/fibo/ontology/",
+        "http://purl.org/blondie/ontology/"
+      ]
+    },
+
+    /* ===================== CLASSES ===================== */
+
+    {
+      "@id": "ex:Token",
+      "@type": "owl:Class",
+      "rdfs:subClassOf": "fibo:FinancialInstrument",
+      "name": "Token (crypto asset)",
+      "description": "A crypto token/coin modeled as a financial instrument.",
+      "conformsTo": "https://spec.edmcouncil.org/fibo/ontology/",
+      "ex:symbol": { "@type": "xsd:string" }
+    },
+    {
+      "@id": "ex:Whitepaper",
+      "@type": ["owl:Class", "bibo:Document", "schema:ScholarlyArticle", "prov:Entity"],
+      "name": "Whitepaper",
+      "description": "A project/token whitepaper.",
+      "conformsTo": "http://purl.org/ontology/bibo/"
+    },
+    {
+      "@id": "ex:Agent",
+      "@type": ["owl:Class", "prov:Agent", "foaf:Agent"],
+      "name": "Agent (person or organization)",
+      "description": "A person or organization participating in authorship, governance, etc.",
+      "conformsTo": "http://www.w3.org/ns/prov#"
+    },
+    {
+      "@id": "ex:Exchange",
+      "@type": ["owl:Class", "schema:Organization"],
+      "name": "Exchange",
+      "description": "An exchange platform (centralized or decentralized).",
+      "conformsTo": "https://schema.org/Organization"
+    },
+    {
+      "@id": "ex:Strategy",
+      "@type": ["owl:Class", "schema:CreativeWork"],
+      "name": "Trading Strategy",
+      "description": "A trading strategy extracted from research papers or code.",
+      "conformsTo": "https://schema.org/CreativeWork"
+    },
+    {
+      "@id": "ex:Indicator",
+      "@type": ["owl:Class", "schema:Intangible"],
+      "name": "Technical Indicator",
+      "description": "An indicator with parameters used by strategies.",
+      "conformsTo": "https://schema.org/Intangible"
+    },
+    {
+      "@id": "ex:Parameter",
+      "@type": "owl:Class",
+      "name": "Indicator Parameter",
+      "description": "Key/value parameter for an indicator."
+    },
+    {
+      "@id": "ex:Signal",
+      "@type": ["owl:Class", "schema:Intangible"],
+      "name": "Entry/Exit Rule",
+      "description": "A rule expressing entry or exit conditions for a strategy.",
+      "conformsTo": "https://schema.org/Intangible"
+    },
+    {
+      "@id": "ex:Block",
+      "@type": ["owl:Class", "blon:Block"],
+      "name": "Block",
+      "description": "Blockchain block (chain-agnostic).",
+      "conformsTo": "http://purl.org/blondie/ontology/"
+    },
+    {
+      "@id": "ex:Transaction",
+      "@type": ["owl:Class", "blon:Transaction"],
+      "name": "Transaction",
+      "description": "Blockchain transaction (chain-agnostic).",
+      "conformsTo": "http://purl.org/blondie/ontology/"
+    },
+
+    /* ===================== OBJECT PROPERTIES ===================== */
+
+    {
+      "@id": "ex:describesToken",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Whitepaper",
+      "rdfs:range":  "ex:Token",
+      "name": "describes token",
+      "conformsTo": "http://purl.org/ontology/bibo/"
+    },
+    {
+      "@id": "ex:authoredBy",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Whitepaper",
+      "rdfs:range":  "ex:Agent",
+      "name": "authored by",
+      "conformsTo": "http://www.w3.org/ns/prov#"
+    },
+    {
+      "@id": "ex:hasSignal",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Strategy",
+      "rdfs:range":  "ex:Signal",
+      "name": "has signal",
+      "conformsTo": "https://schema.org/Intangible"
+    },
+    {
+      "@id": "ex:usesIndicator",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Strategy",
+      "rdfs:range":  "ex:Indicator",
+      "name": "uses indicator",
+      "conformsTo": "https://schema.org/Intangible"
+    },
+    {
+      "@id": "ex:cites",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Whitepaper",
+      "rdfs:range":  "prov:Entity",
+      "name": "cites",
+      "conformsTo": "http://www.w3.org/ns/prov#"
+    },
+    {
+      "@id": "ex:derivedFrom",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Strategy",
+      "rdfs:range":  "prov:Entity",
+      "name": "derived from",
+      "conformsTo": "http://www.w3.org/ns/prov#"
+    },
+    {
+      "@id": "ex:includedInBlock",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "ex:Transaction",
+      "rdfs:range":  "ex:Block",
+      "name": "included in block",
+      "conformsTo": "http://purl.org/blondie/ontology/"
+    },
+
+    /* ===================== DATA PROPERTIES (selected) ===================== */
+
+    { "@id": "ex:symbol",     "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Token", "rdfs:range": "xsd:string" },
+    { "@id": "ex:family",     "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Strategy", "rdfs:range": "xsd:string" },
+    { "@id": "ex:timeframe",  "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Strategy", "rdfs:range": "xsd:string" },
+    { "@id": "ex:rule",       "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Signal",   "rdfs:range": "xsd:string" },
+    { "@id": "ex:direction",  "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Signal",   "rdfs:range": "xsd:string" },
+    { "@id": "ex:ast",        "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Signal",   "rdfs:range": "xsd:string" },
+    { "@id": "ex:height",     "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Block",    "rdfs:range": "xsd:integer" },
+    { "@id": "ex:hash",       "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Block",    "rdfs:range": "xsd:string" },
+    { "@id": "ex:timestamp",  "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Block",    "rdfs:range": "xsd:dateTime" },
+    { "@id": "ex:chain",      "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Block",    "rdfs:range": "xsd:string" },
+    { "@id": "ex:txid",       "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Transaction","rdfs:range": "xsd:string" },
+    { "@id": "ex:from",       "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Transaction","rdfs:range": "xsd:string" },
+    { "@id": "ex:to",         "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Transaction","rdfs:range": "xsd:string" },
+    { "@id": "ex:value",      "@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Transaction","rdfs:range": "xsd:string" },
+    { "@id": "ex:publishedOn","@type": "owl:DatatypeProperty", "rdfs:domain": "ex:Whitepaper","rdfs:range": "xsd:date" }
+  ]
+}

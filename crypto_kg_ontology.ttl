@@ -1,0 +1,205 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms:<http://purl.org/dc/terms/> .
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix bibo:   <http://purl.org/ontology/bibo/> .
+@prefix fibo:   <https://spec.edmcouncil.org/fibo/ontology/> .
+@prefix blon:   <http://purl.org/blondie/ontology/> .
+@prefix ethon:  <http://ethon.consensys.net/ontology#> .
+@prefix ex:     <http://example.org/kg#> .
+
+ex:Ontology a owl:Ontology ;
+  schema:name "Crypto Research KG" ;
+  schema:description "Standards-aligned ontology for MCP-driven crypto research and trading knowledge graph." ;
+  dcterms:conformsTo schema:, prov:, bibo:, fibo:, blon: .
+
+########## CLASSES ##########
+
+ex:Token a owl:Class ;
+  rdfs:subClassOf fibo:FinancialInstrument ;
+  schema:name "Token (crypto asset)" ;
+  schema:description "A crypto token/coin modeled as a financial instrument." ;
+  dcterms:conformsTo fibo: .
+
+ex:Whitepaper a owl:Class, bibo:Document, schema:ScholarlyArticle, prov:Entity ;
+  schema:name "Whitepaper" ;
+  schema:description "A project/token whitepaper." ;
+  dcterms:conformsTo bibo: .
+
+ex:Agent a owl:Class, prov:Agent, foaf:Agent ;
+  schema:name "Agent (person or organization)" ;
+  schema:description "A person or organization participating in authorship, governance, etc." ;
+  dcterms:conformsTo prov: .
+
+ex:Exchange a owl:Class, schema:Organization ;
+  schema:name "Exchange" ;
+  schema:description "An exchange platform (centralized or decentralized)." ;
+  dcterms:conformsTo schema:Organization .
+
+ex:Strategy a owl:Class, schema:CreativeWork ;
+  schema:name "Trading Strategy" ;
+  schema:description "A trading strategy extracted from research papers or code." ;
+  dcterms:conformsTo schema:CreativeWork .
+
+ex:Indicator a owl:Class, schema:Intangible ;
+  schema:name "Technical Indicator" ;
+  schema:description "An indicator with parameters used by strategies." ;
+  dcterms:conformsTo schema:Intangible .
+
+ex:Parameter a owl:Class ;
+  schema:name "Indicator Parameter" ;
+  schema:description "Key/value parameter for an indicator." .
+
+ex:Signal a owl:Class, schema:Intangible ;
+  schema:name "Entry/Exit Rule" ;
+  schema:description "A rule expressing entry or exit conditions for a strategy." ;
+  dcterms:conformsTo schema:Intangible .
+
+ex:Block a owl:Class, blon:Block ;
+  schema:name "Block" ;
+  schema:description "Blockchain block (chain-agnostic)." ;
+  dcterms:conformsTo blon: .
+
+ex:Transaction a owl:Class, blon:Transaction ;
+  schema:name "Transaction" ;
+  schema:description "Blockchain transaction (chain-agnostic)." ;
+  dcterms:conformsTo blon: .
+
+########## OBJECT PROPERTIES ##########
+
+ex:describesToken a owl:ObjectProperty ;
+  rdfs:domain ex:Whitepaper ;
+  rdfs:range  ex:Token ;
+  schema:name "describes token" ;
+  dcterms:conformsTo bibo: .
+
+ex:authoredBy a owl:ObjectProperty ;
+  rdfs:domain ex:Whitepaper ;
+  rdfs:range  ex:Agent ;
+  schema:name "authored by" ;
+  dcterms:conformsTo prov: .
+
+ex:hasSignal a owl:ObjectProperty ;
+  rdfs:domain ex:Strategy ;
+  rdfs:range  ex:Signal ;
+  schema:name "has signal" ;
+  dcterms:conformsTo schema:Intangible .
+
+ex:usesIndicator a owl:ObjectProperty ;
+  rdfs:domain ex:Strategy ;
+  rdfs:range  ex:Indicator ;
+  schema:name "uses indicator" ;
+  dcterms:conformsTo schema:Intangible .
+
+ex:cites a owl:ObjectProperty ;
+  rdfs:domain ex:Whitepaper ;
+  rdfs:range  prov:Entity ;
+  schema:name "cites" ;
+  dcterms:conformsTo prov: .
+
+ex:derivedFrom a owl:ObjectProperty ;
+  rdfs:domain ex:Strategy ;
+  rdfs:range  prov:Entity ;
+  schema:name "derived from" ;
+  dcterms:conformsTo prov: .
+
+ex:includedInBlock a owl:ObjectProperty ;
+  rdfs:domain ex:Transaction ;
+  rdfs:range  ex:Block ;
+  schema:name "included in block" ;
+  dcterms:conformsTo blon: .
+
+########## DATA PROPERTIES ##########
+
+ex:symbol a owl:DatatypeProperty ;
+  rdfs:domain ex:Token ;
+  rdfs:range xsd:string .
+
+ex:family a owl:DatatypeProperty ;
+  rdfs:domain ex:Strategy ;
+  rdfs:range xsd:string .
+
+ex:timeframe a owl:DatatypeProperty ;
+  rdfs:domain ex:Strategy ;
+  rdfs:range xsd:string .
+
+ex:rule a owl:DatatypeProperty ;
+  rdfs:domain ex:Signal ;
+  rdfs:range xsd:string .
+
+ex:direction a owl:DatatypeProperty ;
+  rdfs:domain ex:Signal ;
+  rdfs:range xsd:string .
+
+ex:ast a owl:DatatypeProperty ;
+  rdfs:domain ex:Signal ;
+  rdfs:range xsd:string .
+
+ex:height a owl:DatatypeProperty ;
+  rdfs:domain ex:Block ;
+  rdfs:range xsd:integer .
+
+ex:hash a owl:DatatypeProperty ;
+  rdfs:domain ex:Block ;
+  rdfs:range xsd:string .
+
+ex:timestamp a owl:DatatypeProperty ;
+  rdfs:domain ex:Block ;
+  rdfs:range xsd:dateTime .
+
+ex:chain a owl:DatatypeProperty ;
+  rdfs:domain ex:Block ;
+  rdfs:range xsd:string .
+
+ex:txid a owl:DatatypeProperty ;
+  rdfs:domain ex:Transaction ;
+  rdfs:range xsd:string .
+
+ex:from a owl:DatatypeProperty ;
+  rdfs:domain ex:Transaction ;
+  rdfs:range xsd:string .
+
+ex:to a owl:DatatypeProperty ;
+  rdfs:domain ex:Transaction ;
+  rdfs:range xsd:string .
+
+ex:value a owl:DatatypeProperty ;
+  rdfs:domain ex:Transaction ;
+  rdfs:range xsd:string .
+
+ex:publishedOn a owl:DatatypeProperty ;
+  rdfs:domain ex:Whitepaper ;
+  rdfs:range xsd:date .
+
+########## SHACL (overlay) ##########
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+ex:StrategyShape a sh:NodeShape ;
+  sh:targetClass ex:Strategy ;
+  sh:property [ sh:path ex:hasSignal ; sh:minCount 2 ] ;
+  sh:property [
+    sh:path ex:hasSignal ;
+    sh:qualifiedValueShape [ sh:property [ sh:path ex:direction ; sh:hasValue "entry" ] ] ;
+    sh:qualifiedMinCount 1
+  ] ;
+  sh:property [
+    sh:path ex:hasSignal ;
+    sh:qualifiedValueShape [ sh:property [ sh:path ex:direction ; sh:hasValue "exit" ] ] ;
+    sh:qualifiedMinCount 1
+  ] .
+
+ex:WhitepaperShape a sh:NodeShape ;
+  sh:targetClass ex:Whitepaper ;
+  sh:property [ sh:path ex:describesToken ; sh:minCount 1 ] ;
+  sh:property [ sh:path ex:authoredBy ; sh:minCount 1 ] ;
+  sh:property [ sh:path dcterms:conformsTo ; sh:minCount 1 ] .
+
+ex:TokenShape a sh:NodeShape ;
+  sh:targetClass ex:Token ;
+  sh:property [ sh:path ex:symbol ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path dcterms:conformsTo ; sh:minCount 1 ] .
